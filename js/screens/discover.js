@@ -10,7 +10,7 @@ import {
 } from '../logic.js';
 import {
   register, go, reset, back, esc, toast, appbar, tabbar, doctorCard, facilityCard, emptyState, avatar,
-  seg, chip, registerGlobal, rerender, stackDepth,
+  seg, chip, registerGlobal, rerender, stackDepth, miniMap,
 } from '../ui.js';
 
 // ============================================================ 05 HOME MAP
@@ -350,14 +350,17 @@ register('facility', {
             </div>
           </div>
         </div>
-        <div class="card" style="padding:var(--sp-3) var(--sp-4)">
-          <div class="between">
-            <div><div class="h3" style="font-size:14px">${esc(L(f.area))}</div><div class="xs ltr-num" style="margin-top:2px">${esc(f.phone)}</div></div>
-            <div style="text-align:end"><div class="dist">${esc(fmtDist(km))}</div><div class="xs">${esc(t('minDrive', { n: driveMin(km) }))}</div></div>
-          </div>
-          <div class="row" style="margin-top:var(--sp-3);gap:var(--sp-2)">
-            <button class="btn btn-secondary btn-sm grow" data-act="dir" data-fid="${f.id}">${icon('nav')}${esc(t('getDirections'))}</button>
-            <button class="btn btn-ghost btn-sm" data-act="tel" data-tel="${f.phone}">${icon('phone')}${esc(t('callFacility'))}</button>
+        <div class="card map-card">
+          ${miniMap(f, here())}
+          <div class="map-card-body">
+            <div class="between">
+              <div><div class="h3" style="font-size:14px">${esc(L(f.area))}</div><div class="xs ltr-num" style="margin-top:2px">${esc(f.phone)}</div></div>
+              <div style="text-align:end"><div class="dist">${esc(fmtDist(km))}</div><div class="xs">${esc(t('minDrive', { n: driveMin(km) }))}</div></div>
+            </div>
+            <div class="row" style="margin-top:var(--sp-3);gap:var(--sp-2)">
+              <button class="btn btn-primary btn-sm grow" data-act="dir" data-fid="${f.id}">${icon('nav')}${esc(t('getDirections'))}</button>
+              <button class="btn btn-ghost btn-sm" data-act="tel" data-tel="${f.phone}">${icon('phone')}${esc(t('callFacility'))}</button>
+            </div>
           </div>
         </div>
         <div>
@@ -397,12 +400,18 @@ register('doctor', {
             </div>
           </div>
         </div>
-        <div class="card" style="padding:var(--sp-3) var(--sp-4)">
-          <button class="between" style="width:100%;background:none;border:0;text-align:start;padding:0" data-go="facility" data-id="${d.f.id}">
-            <div><div class="h3" style="font-size:14px">${esc(L(d.f))}</div><div class="xs" style="margin-top:2px">${esc(L(d.f.area))}</div></div>
-            <div style="text-align:end"><div class="dist">${esc(fmtDist(d.km))}</div><div class="xs">${esc(t('minDrive', { n: driveMin(d.km) }))}</div></div>
-          </button>
-          <button class="btn btn-secondary btn-sm" style="width:100%;margin-top:var(--sp-3)" data-act="dir" data-fid="${d.f.id}">${esc(t('getDirections'))}</button>
+<div class="card map-card">
+          ${miniMap(d.f, here())}
+          <div class="map-card-body">
+            <button class="between" style="width:100%;background:none;border:0;text-align:start;padding:0" data-go="facility" data-id="${d.f.id}">
+              <div class="grow"><div class="h3" style="font-size:14px">${esc(L(d.f))}</div><div class="xs" style="margin-top:2px">${esc(L(d.f.area))}</div></div>
+              <div style="text-align:end"><div class="dist">${esc(fmtDist(d.km))}</div><div class="xs">${esc(t('minDrive', { n: driveMin(d.km) }))}</div></div>
+            </button>
+            <div class="row" style="gap:var(--sp-2);margin-top:var(--sp-3)">
+              <button class="btn btn-primary btn-sm grow" data-act="dir" data-fid="${d.f.id}">${icon('nav')}${esc(t('getDirections'))}</button>
+              <button class="btn btn-ghost btn-sm" data-act="tel" data-tel="${d.f.phone}" aria-label="${esc(t('callFacility'))}">${icon('phone')}</button>
+            </div>
+          </div>
         </div>
         ${ins && bookable ? `<div class="note ${covered ? 'brand' : 'warn'} row" style="gap:8px">${icon(covered ? 'shield' : 'info')}<span>${esc(t(covered ? 'coveredBy' : 'notCovered', { i: insName(ins) }))}</span></div>` : ''}
         ${!bookable ? `<div class="note danger row" style="gap:8px;align-items:flex-start">${icon('siren')}<span>${esc(state.lang === 'ar' ? 'قسم الطوارئ — لا حاجة لموعد. توجّه مباشرة، مفتوح ٢٤ ساعة. في الحالات المهددة للحياة اتصل بـ ٩٩٧.' : 'Emergency department — no appointment needed. Walk in, open 24 hours. For life-threatening cases call 997.')}</span></div>` : ''}

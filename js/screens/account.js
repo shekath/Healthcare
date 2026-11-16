@@ -78,7 +78,7 @@ register('account', {
     signOut: async () => {
       if (!await confirmDialog({ title: t('signOutQ'), body: t('signOutBody'), ok: t('signOut'), danger: true })) return;
       state.session = null; commit();
-      reset('signin');
+      reset('splash');
     },
     resetDemo: async () => {
       if (!await confirmDialog({ title: t('resetQ'), body: t('resetBody'), ok: t('resetDemo'), danger: true })) return;

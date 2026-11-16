@@ -1,4 +1,4 @@
-// Stage 1 — Entry and identity: sign in (with traveler switch), OTP, location.
+// Stage 1 — Entry and identity: splash, sign in (with traveler switch), OTP, location.
 import { state, commit, P } from '../store.js';
 import { t, L, num } from '../i18n.js';
 import { icon } from '../icons.js';
@@ -7,7 +7,75 @@ import { haversine } from '../logic.js';
 import { register, go, reset, back, esc, toast, openSheet, closeOverlay, appbar } from '../ui.js';
 import { applyTheme, toggleLang } from '../shell.js';
 
-// ------------------------------------------------------------ 01 sign in (app entry)
+// ------------------------------------------------------------ 00 splash
+// Always Saudi green: it is shown before the user picks Traveler mode.
+const SPLASH_ART = `
+<svg class="splash-svg" viewBox="0 0 390 460" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="sg-glow" cx="50%" cy="46%" r="50%">
+      <stop offset="0" stop-color="#7FE3B4" stop-opacity=".35"/><stop offset="1" stop-color="#7FE3B4" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sg-pin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E4F4EB"/></linearGradient>
+  </defs>
+  <g stroke="#FFFFFF" stroke-opacity=".07" stroke-width="1">
+    <path d="M0 60H390M0 120H390M0 180H390M0 240H390M0 300H390M0 360H390M0 420H390"/>
+    <path d="M45 0V460M110 0V460M175 0V460M240 0V460M305 0V460M370 0V460"/>
+  </g>
+  <path d="M-10 268 C 60 250, 110 300, 175 262 S 300 210, 400 240" stroke="#FFFFFF" stroke-opacity=".10" stroke-width="16" fill="none" stroke-linecap="round"/>
+  <circle cx="195" cy="210" r="170" fill="url(#sg-glow)"/>
+  <g fill="none" stroke="#FFFFFF">
+    <circle cx="195" cy="210" r="78" stroke-opacity=".18"/>
+    <circle cx="195" cy="210" r="118" stroke-opacity=".11"/>
+    <circle cx="195" cy="210" r="158" stroke-opacity=".06"/>
+  </g>
+  <path class="splash-ecg" d="M10 300 H120 l12 -26 l14 52 l16 -88 l14 92 l12 -30 H380" fill="none" stroke="#7FE3B4" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".75"/>
+  <g class="splash-pin">
+    <ellipse cx="195" cy="300" rx="34" ry="7" fill="#00381B" fill-opacity=".35"/>
+    <path d="M195 112c-40 0-72 31-72 70 0 52 72 116 72 116s72-64 72-116c0-39-32-70-72-70z" fill="url(#sg-pin)"/>
+    <circle cx="195" cy="182" r="38" fill="#006C35"/>
+    <path d="M187 160h16v14h14v16h-14v14h-16v-14h-14v-16h14z" fill="#FFFFFF"/>
+  </g>
+  <g class="splash-chip" style="animation-delay:-1s">
+    <circle cx="74" cy="132" r="28" fill="#FFFFFF" fill-opacity=".12" stroke="#FFFFFF" stroke-opacity=".25"/>
+    <g transform="translate(62 120)" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v7a5 5 0 0010 0V2"/><path d="M9 14v2a5 5 0 0010 0v-3"/><circle cx="19" cy="11" r="2"/></g>
+  </g>
+  <g class="splash-chip" style="animation-delay:-2.2s">
+    <circle cx="322" cy="118" r="24" fill="#FFFFFF" fill-opacity=".12" stroke="#FFFFFF" stroke-opacity=".25"/>
+    <path transform="translate(311 107)" d="M11 20s-8-5-8-11a4.5 4.5 0 018-2.8A4.5 4.5 0 0119 9c0 6-8 11-8 11z" fill="#7FE3B4"/>
+  </g>
+  <g class="splash-chip" style="animation-delay:-3.1s">
+    <circle cx="58" cy="258" r="22" fill="#FFFFFF" fill-opacity=".12" stroke="#FFFFFF" stroke-opacity=".25"/>
+    <g transform="translate(47 247)" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="18" height="16" rx="2"/><path d="M2 9h18M7 2v4M15 2v4M8 14l2 2 4-4"/></g>
+  </g>
+  <g class="splash-chip" style="animation-delay:-.4s">
+    <circle cx="334" cy="250" r="26" fill="#FFFFFF" fill-opacity=".12" stroke="#FFFFFF" stroke-opacity=".25"/>
+    <g transform="translate(322 238)" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22V6l8-3v19M11 8h10v14M7 9v.5M7 13v.5M7 17v.5M16 12v.5M16 16v.5M1 22h22"/></g>
+  </g>
+</svg>`;
+
+register('splash', {
+  edge: true, onBrand: true,
+  render: () => `
+    <div class="body"><div class="splash">
+      <div class="splash-art">${SPLASH_ART}</div>
+      <div class="splash-overlay" aria-hidden="true"></div>
+      <div class="splash-content">
+        <button class="lang-pill" data-act="toggleLang" style="align-self:flex-end">${esc(t('langToggle'))}</button>
+        <div class="grow"></div>
+        <div>
+          <div class="wordmark splash-wordmark" aria-label="QRIB">QR<i>Ī</i>B</div>
+          <p class="splash-tag">${esc(t('appTagline'))}</p>
+        </div>
+        <div class="stack" style="margin-top:28px">
+          <button class="btn" style="background:#fff;color:#004A24" data-go="signin">${esc(t('getStarted'))}</button>
+          <button class="btn" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.45)" data-go="signin">${esc(t('haveAccount'))}</button>
+          <p class="splash-foot">${icon('shield')} ${esc(t('licensedOnly'))}</p>
+        </div>
+      </div>
+    </div></div>`,
+});
+
+// ------------------------------------------------------------ 01 sign in
 // Opens the app. A switch picks Traveler mode, which changes the theme live.
 const SA_RE = /^5\d{8}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;

@@ -168,6 +168,9 @@ export function bindEvents(host) {
   host.addEventListener('keydown', ev => {
     if (ev.key === 'Escape') { if (closeOverlay()) ev.preventDefault(); return; }
     const el = ev.target;
+    if ((ev.key === 'Enter' || ev.key === ' ') && el.getAttribute('role') === 'link' && el.dataset.go) {
+      ev.preventDefault(); el.click(); return;
+    }
     if (ev.key === 'Enter' && el.dataset.enter) {
       ev.preventDefault();
       dispatch(el.dataset.enter, el, ev);
@@ -305,11 +308,11 @@ export function doctorCard(d, { showFacility = true, extra = '' } = {}) {
 export function facilityCard(f, { sel = false } = {}) {
   const oi = f.oi || openInfo(f);
   const n = f.docs ? f.docs.length : 0;
-  return `<button class="card tap ${sel ? 'sel' : ''}" style="padding:var(--sp-3)" data-go="facility" data-id="${f.id}" data-fid="${f.id}">
-    <div class="row">
+  return `<div class="card tap fcard ${sel ? 'sel' : ''}" role="link" tabindex="0" data-go="facility" data-id="${f.id}" data-fid="${f.id}" aria-label="${esc(L(f))}">
+    <div class="row" style="align-items:flex-start">
       ${avatar(f.short, f.tone)}
       <div class="grow">
-        <div class="between"><div class="h3 ellipsis">${esc(L(f))}</div><span class="dist">${esc(fmtDist(f.km))}</span></div>
+        <div class="h3 ellipsis">${esc(L(f))}</div>
         <div class="xs ellipsis" style="margin-top:2px">${esc(L(f.type))} · ${esc(oi.label)}</div>
         <div class="row wrap" style="gap:5px;margin-top:7px">
           <span class="tag ${oi.open ? 'tag-open' : 'tag-closed'}">${esc(t(oi.open ? 'open' : 'closed'))}</span>
@@ -317,7 +320,35 @@ export function facilityCard(f, { sel = false } = {}) {
           ${n ? `<span class="tag">${esc(n === 1 ? t('oneDoctor') : t('nDoctors', { n }))}</span>` : ''}
         </div>
       </div>
+      <div class="fcard-side">
+        <span class="dist">${esc(fmtDist(f.km))}</span>
+        <button class="dir-btn" data-act="dir" data-fid="${f.id}" aria-label="${esc(t('getDirections'))}: ${esc(L(f))}" title="${esc(t('getDirections'))}">${icon('nav')}</button>
+      </div>
     </div>
+  </div>`;
+}
+
+/** Static mini-map centred on a facility, with "you" when close enough. Tapping opens directions. */
+export function miniMap(f, here) {
+  const kx = 111.32 * Math.cos(here.lat * Math.PI / 180), ky = 110.57;
+  const dx = (here.lng - f.lng) * kx, dy = (here.lat - f.lat) * ky;   // user relative to facility, km
+  const km = Math.hypot(dx, dy);
+  const scale = Math.min(70, Math.max(18, 110 / Math.max(km, 0.2)));
+  const ux = dx * scale, uy = -dy * scale;
+  const showYou = Math.abs(ux) < 165 && Math.abs(uy) < 62;
+  return `<button class="minimap" data-act="dir" data-fid="${f.id}" aria-label="${esc(t('getDirections'))}: ${esc(L(f))}">
+    <span class="map-grid"></span>
+    <span class="road h" style="top:calc(58% - 7px)"></span>
+    <span class="road v" style="left:calc(50% + 46px)"></span>
+    <span class="road v thin" style="left:calc(50% - 120px)"></span>
+    <span class="road h thin" style="top:18%"></span>
+    <span class="parcel" style="top:24%;left:calc(50% - 100px);width:90px;height:30%"></span>
+    <span class="parcel" style="top:24%;left:calc(50% + 70px);width:80px;height:30%"></span>
+    <span class="parcel" style="top:68%;left:calc(50% - 30px);width:66px;height:26%"></span>
+    ${showYou ? `<span class="you" style="left:calc(50% + ${ux.toFixed(1)}px);top:calc(58% + ${uy.toFixed(1)}px)"></span>` : ''}
+    <span class="pin" style="left:50%;top:58%"><b>+</b></span>
+    <span class="map-chip">${icon('pin')}${esc(L(f.area))}</span>
+    <span class="map-chip end">${icon('nav')}${esc(t('openMaps'))}</span>
   </button>`;
 }
 

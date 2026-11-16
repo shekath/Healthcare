@@ -33,7 +33,11 @@ await page.reload();
 await page.waitForTimeout(500);
 
 console.log('Entry & identity (traveler)');
-check(await screen() === 'signin', 'app opens on sign in');
+check(await screen() === 'splash', 'app opens on splash');
+check(await page.locator('.splash-svg').count() === 1, 'splash shows healthcare graphic');
+await shot('splash');
+await tap('text=Get started');
+check(await screen() === 'signin', 'Get started → sign in');
 check(await theme() === 'resident', 'resident theme by default');
 check(await page.locator('[data-v="nafath"]').count() === 1, 'Nafath offered to residents');
 await shot('signin-resident');
@@ -64,6 +68,11 @@ check(await screen() === 'map', 'GPS outside KSA falls back to a city and opens 
 const city = await page.evaluate(() => window.QRIB.state.loc.city);
 check(city === 'makkah', 'traveler fallback city is Makkah (got ' + city + ')');
 check(await page.locator('#sheet .card').count() > 0, 'nearby facilities listed');
+check(await page.locator('#sheet .fcard .dir-btn').count() === await page.locator('#sheet .fcard').count(), 'every nearby card has a directions button');
+await page.evaluate(() => { window.__opened = []; HTMLAnchorElement.prototype.click = function () { window.__opened.push(this.href); }; });
+await tap('#sheet .fcard .dir-btn');
+check(await screen() === 'map', 'directions button does not open the card');
+check((await page.evaluate(() => window.__opened[0] || '')).includes('google.com/maps/dir'), 'directions button opens Google Maps');
 check(await page.locator('.map-banner').count() === 1, 'visitor banner on map');
 await shot('map-traveler');
 
@@ -116,6 +125,8 @@ check(await screen() === 'doctors' && n2 < n1 && n2 > 0, `filter narrowed list $
 await shot('doctors');
 await tap('.scroll .card');
 check(await screen() === 'doctor', 'doctor profile');
+check(await page.locator('.minimap .pin').count() === 1, 'doctor profile map shows the address pin');
+check(await page.locator('.map-card [data-act="dir"].btn-primary').count() === 1, 'doctor profile has a Get directions CTA');
 await tap('[data-act="fav"]');
 await shot('doctor');
 

@@ -19,7 +19,7 @@ Then open <http://localhost:8080>.
 
 ## Resident vs Traveler
 
-The app opens on the sign-in screen. An **“I’m a traveler / visitor”** switch at the top turns on Traveler mode, and the theme changes straight away:
+The app opens on a green splash screen, then the sign-in screen. On sign-in, an **“I’m a traveler / visitor”** switch at the top turns on Traveler mode, and the theme changes straight away:
 
 | | Resident | Traveler |
 |---|---|---|
@@ -33,7 +33,8 @@ You can switch later in **Account** (each profile keeps its own data). Every col
 ## What works
 
 **Entry and identity**
-- **01–02** Sign in is the first screen. It combines the splash (brand header, tagline, language switch) with the sign-in form, plus the traveler switch. It has validation:
+- **01** Splash: an illustrated healthcare graphic (map pin with a medical cross, heartbeat line, care icons) under a Saudi-green gradient overlay, with a language switch.
+- **02** Sign in, with a brand header and the traveler switch. It has validation:
   - Saudi numbers must be `5XXXXXXXX`; international numbers 6–14 digits; email checked too.
   - SSO options are simulated, and Nafath shows a number-matching step.
 - **03** OTP:
@@ -49,15 +50,17 @@ You can switch later in **Account** (each profile keeps its own data). Every col
   - Pins are placed from real coordinates around you. Drag to pan; zoom with the buttons or the mouse wheel; re-centre.
   - Filter chips: open now, emergency, and 6 specialties.
   - Tapping a pin highlights its card; tapping again opens the facility.
+  - Every Nearby care card has its own directions button.
   - The bottom sheet expands, and shows your next booking.
   - The SOS button opens emergency numbers (997, 911, 937, 999/930) and the nearest emergency department.
 - Search across doctors, hospitals and specialties, in English or Arabic (Arabic search ignores diacritics and letter variants). Recent searches are kept, and there's a specialty grid.
 - **06** Refine: specialty, distance, availability, languages, gender, visit type, and "accepts my insurance". The button shows a live "Show N doctors" count.
 - **07** Doctor list, nearest first, with a summary of active filters.
-- Facility page (not in the design): opening hours, accepted insurers, call, directions, and its doctors.
+- Facility page (not in the design): a map with the address pin, opening hours, accepted insurers, call, directions, and its doctors.
 - **08** Doctor profile:
   - Favourite toggle, credentials, languages and fee.
-  - Insurance coverage check, and directions (Google Maps).
+  - A map of the doctor's clinic with its address pin and your position, plus a Get directions button (Google Maps).
+  - Insurance coverage check.
   - Emergency doctors show walk-in, call-997 and directions buttons instead of a booking button.
 
 **Book and keep**

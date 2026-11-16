@@ -58,7 +58,7 @@ function renderDemoPanel() {
       <h3>${ar ? 'نصائح العرض' : 'Demo tips'}</h3>
       <p>${ar ? 'رمز التحقق يظهر على الشاشة وفي إشعار. الحجوزات تظهر في «المحفوظة» وملخص الزيارة في «التقارير».'
              : 'The OTP code is shown on screen and in a toast. Bookings appear under Saved, and a pending visit summary under Reports.'}</p>
-      <button class="btn btn-ghost btn-sm" style="width:100%" data-demo="restart">${ar ? 'العودة إلى تسجيل الدخول' : 'Back to sign in'}</button>
+      <button class="btn btn-ghost btn-sm" style="width:100%" data-demo="restart">${ar ? 'العودة إلى شاشة البداية' : 'Restart from splash'}</button>
       <button class="btn btn-ghost btn-sm" style="width:100%" data-demo="reset">${esc(t('resetDemo'))}</button>
     </div>`;
 }
@@ -71,7 +71,7 @@ function bindDemoPanel() {
     const a = b.dataset.demo;
     if (a === 'mode') { setMode(b.dataset.v); toast(t('switchedTo', { m: t(b.dataset.v === 'traveler' ? 'travelerMode' : 'residentMode') })); }
     if (a === 'lang') setLang(b.dataset.v);
-    if (a === 'restart') { state.session = null; commit(); reset('signin'); }
+    if (a === 'restart') { state.session = null; commit(); reset('splash'); }
     if (a === 'reset') { resetAll(); commit(); location.reload(); }
   });
 }
@@ -88,7 +88,7 @@ function start() {
   tickClock(); setInterval(tickClock, 15000);
 
   if (state.session && state.mode) reset(state.loc ? 'map' : 'location');
-  else reset('signin');
+  else reset('splash');
 
   window.addEventListener('offline', () => toast(t('offline'), 3500));
 

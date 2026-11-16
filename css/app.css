@@ -379,6 +379,27 @@ select.prefix{border-top:0;border-bottom:0;border-inline-start:0;background:tran
 .map-banner svg{width:16px;height:16px;flex:0 0 16px;}
 .map-banner button{margin-inline-start:auto;background:none;border:0;color:var(--brand-accent);font-weight:600;font-size:var(--fs-xs);}
 
+/* nearby-care card with a directions button */
+.fcard{padding:var(--sp-3);}
+.fcard-side{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex:0 0 auto;}
+.dir-btn{width:40px;height:40px;border-radius:var(--r-md);border:1px solid var(--brand-100);background:var(--brand-50);color:var(--brand-700);display:grid;place-items:center;transition:background-color .15s ease;}
+.dir-btn:active{background:var(--brand-100);}
+.dir-btn:focus-visible{outline:2px solid var(--border-focus);outline-offset:2px;}
+.dir-btn svg{width:18px;height:18px;}
+.card.tap:focus-visible{outline:2px solid var(--border-focus);outline-offset:2px;}
+
+/* mini-map on doctor and facility pages */
+.map-card{padding:0;overflow:hidden;}
+.map-card-body{padding:var(--sp-3) var(--sp-4) var(--sp-4);}
+.minimap{position:relative;display:block;width:100%;height:150px;border:0;padding:0;background:var(--map-ground);overflow:hidden;cursor:pointer;border-bottom:1px solid var(--border-default);}
+.minimap .map-grid{inset:0;}
+.minimap .road.h{left:0;width:100%;} .minimap .road.v{top:0;height:100%;}
+.minimap .pin{pointer-events:none;}
+.map-chip{position:absolute;bottom:10px;inset-inline-start:10px;display:inline-flex;align-items:center;gap:5px;max-width:58%;
+  background:var(--surface-card);color:var(--content-primary);border-radius:var(--r-pill);padding:5px 10px;font-size:var(--fs-xs);font-weight:500;box-shadow:var(--elev-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.map-chip.end{inset-inline-start:auto;inset-inline-end:10px;top:10px;bottom:auto;color:var(--content-brand);font-weight:600;}
+.map-chip svg{width:13px;height:13px;flex:0 0 13px;}
+
 /* bottom sheet */
 .sheet{
   background:var(--surface-card);border-radius:var(--r-lg) var(--r-lg) 0 0;border-top:1px solid var(--border-default);
@@ -428,6 +449,27 @@ select.prefix{border-top:0;border-bottom:0;border-inline-start:0;background:tran
 .success-mark{width:82px;height:82px;border-radius:50%;background:var(--brand-600);display:grid;place-items:center;margin:0 auto;animation:pop .4s cubic-bezier(.2,1.6,.4,1);}
 .success-mark::after{content:"";width:28px;height:14px;border-inline-start:4px solid #fff;border-block-end:4px solid #fff;transform:rotate(-45deg);margin-bottom:7px;}
 @keyframes pop{from{transform:scale(.4);opacity:0;}to{transform:none;opacity:1;}}
+
+/* splash — fixed Saudi green with a healthcare illustration under a gradient overlay */
+.splash{flex:1;position:relative;overflow:hidden;color:#fff;background:linear-gradient(165deg,#00381B 0%,#005A2B 55%,#0B8A48 100%);}
+.splash-art{position:absolute;inset:0 0 auto 0;height:68%;}
+.splash-art .splash-svg{width:100%;height:100%;display:block;}
+.splash-overlay{position:absolute;inset:0;background:
+  linear-gradient(180deg,rgba(0,56,27,.55) 0%,rgba(0,56,27,0) 22%,rgba(0,56,27,0) 48%,rgba(0,56,27,.82) 72%,#00381B 100%),
+  radial-gradient(120% 60% at 50% 110%,rgba(11,138,72,.35),transparent 70%);}
+.splash-content{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;
+  padding:calc(var(--map-top) + 16px) var(--sp-6) max(var(--sp-8),calc(var(--safe-bottom) + 16px));}
+.splash-wordmark{font-size:44px;}
+.splash-wordmark i{color:#7FE3B4;}
+.splash-tag{font-size:17px;color:#CDEBDC;margin-top:var(--sp-3);line-height:1.55;max-width:26ch;}
+.splash-foot{text-align:center;font-size:var(--fs-xs);color:#A9D6C0;margin-top:var(--sp-2);}
+.splash-foot svg{width:12px;height:12px;vertical-align:-1px;}
+.splash-pin{animation:floatY 5s ease-in-out infinite;transform-box:fill-box;}
+.splash-chip{animation:floatY 6s ease-in-out infinite;transform-box:fill-box;}
+.splash-ecg{stroke-dasharray:520;stroke-dashoffset:520;animation:ecg 3.2s ease-in-out infinite;}
+@keyframes floatY{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+@keyframes ecg{0%{stroke-dashoffset:520;}55%{stroke-dashoffset:0;}100%{stroke-dashoffset:-520;}}
+@media (prefers-reduced-motion:reduce){.splash-ecg{stroke-dashoffset:0;}}
 
 /* login (app entry) */
 .wordmark{font-size:34px;font-weight:600;letter-spacing:-1px;direction:ltr;display:inline-block;color:#fff;}
