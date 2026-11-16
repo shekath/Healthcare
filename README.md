@@ -55,11 +55,12 @@ You can switch later in **Account** (each profile keeps its own data). Every col
   - The SOS button opens emergency numbers (997, 911, 937, 999/930) and the nearest emergency department.
 - Search across doctors, hospitals and specialties, in English or Arabic (Arabic search ignores diacritics and letter variants). Recent searches are kept, and there's a specialty grid.
 - **06** Refine: specialty, distance, availability, languages, gender, visit type, and "accepts my insurance". The button shows a live "Show N doctors" count.
-- **07** Doctor list, nearest first, with a summary of active filters.
-- Facility page (not in the design): a map with the address pin, opening hours, accepted insurers, call, directions, and its doctors.
+- **07** Doctor list, nearest first, with a summary of active filters. Filter is a floating button at the bottom, above the tab bar (also on Search).
+- Facility page (not in the design): a map with the address pin, a bottom bar with Call and Get directions, opening hours, accepted insurers, call, directions, and its doctors.
 - **08** Doctor profile:
   - Favourite toggle, credentials, languages and fee.
-  - A map of the doctor's clinic with its address pin and your position, plus a Get directions button (Google Maps).
+  - A map of the doctor's clinic with its address pin and your position.
+  - A bottom action bar in thumb reach: Directions, Call, and a large primary **Book appointment** button.
   - Insurance coverage check.
   - Emergency doctors show walk-in, call-997 and directions buttons instead of a booking button.
 
@@ -80,7 +81,7 @@ You can switch later in **Account** (each profile keeps its own data). Every col
   - A detail view for each record (lab table with high values flagged).
   - Share, download, or export all records as HTML.
   - Each new booking adds a pending visit summary.
-- Account: profile type, language, insurance, city/GPS, emergency numbers, privacy notice, sign out, reset demo data.
+- Account (fifth bottom tab): profile type, language, insurance, city/GPS, emergency numbers, privacy notice, sign out, reset demo data.
 
 **Throughout:** full English/Arabic with RTL layout and Arabic-Indic digits (as in the design); data persists across reloads; the Android back button works; layout respects iPhone notch/safe areas; reduced-motion is respected.
 

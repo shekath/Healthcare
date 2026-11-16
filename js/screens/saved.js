@@ -71,7 +71,7 @@ register('saved', {
         : emptyState('heart', t('noFav'), t('noFavSub'), `<button class="btn btn-primary btn-sm" data-act="tab" data-tab="search">${esc(t('findDoctor'))}</button>`);
     }
     return `<div class="body">
-      ${appbar({ back: false, big: true, title: t('saved'), right: `<button class="iconbtn" data-go="account" aria-label="${esc(t('account'))}">${icon('user')}</button>` })}
+      ${appbar({ back: false, big: true, title: t('saved') })}
       <div class="pad" style="margin-bottom:var(--sp-4)">${seg('savedTab', [['consulted', t('consulted')], ['fav', t('favourites')]], s.tab)}</div>
       <div class="scroll pad stack" data-scroll-id="saved-${s.tab}">${body}</div>
       ${tabbar('saved')}

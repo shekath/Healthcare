@@ -4,7 +4,7 @@ import { t, L, num } from '../i18n.js';
 import { icon } from '../icons.js';
 import { cityById, RESIDENT_INSURERS, TRAVELER_INSURERS } from '../data.js';
 import { nearestEr, fmtDist, directionsUrl, openExternal, insName } from '../logic.js';
-import { register, reset, esc, toast, appbar, seg, openSheet, closeOverlay, confirmDialog, registerGlobal, modeBadge } from '../ui.js';
+import { register, reset, esc, toast, appbar, tabbar, seg, openSheet, closeOverlay, confirmDialog, registerGlobal, modeBadge } from '../ui.js';
 import { setLang, setMode } from '../shell.js';
 import { chooseCitySheet, useGps } from './auth.js';
 
@@ -22,7 +22,7 @@ register('account', {
     const v = state.session?.value || '';
     const init = (v.replace(/[^A-Za-z؀-ۿ]/g, '').slice(0, 1) || 'Q').toUpperCase();
     return `<div class="body">
-      ${appbar({ title: t('account') })}
+      ${appbar({ back: false, big: true, title: t('account') })}
       <div class="scroll pad stack" style="gap:var(--sp-4)">
         <div class="card row">
           <div class="avatar lg">${esc(init)}</div>
@@ -54,6 +54,7 @@ register('account', {
         </div>
         <p class="xs" style="text-align:center;margin-top:4px">${esc(t('version'))}</p>
       </div>
+      ${tabbar('account')}
     </div>`;
   },
   actions: {

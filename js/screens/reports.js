@@ -48,7 +48,7 @@ register('reports', {
     const filters = [['all', 'all'], ['visits', 'visits'], ['lab', 'lab'], ['imaging', 'imaging']];
     if (all.some(r => r.type === 'vac')) filters.push(['vaccines', 'vaccines']);
     return `<div class="body">
-      ${appbar({ back: false, big: true, title: t('reports'), sub: t('reportsSub'), right: `<button class="iconbtn" data-go="account" aria-label="${esc(t('account'))}">${icon('user')}</button>` })}
+      ${appbar({ back: false, big: true, title: t('reports'), sub: t('reportsSub') })}
       <div class="scroll pad stack" data-scroll-id="reports">
         <div class="card" style="background:var(--surface-brand-subtle);border-color:var(--brand-100)">
           <div class="between">

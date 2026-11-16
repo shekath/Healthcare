@@ -64,7 +64,7 @@ register('map', {
         <div class="map-search">
           ${icon('search')}
           <button class="q" data-act="tab" data-tab="search">${esc(t('searchPh'))}</button>
-          <button class="me" data-go="account" aria-label="${esc(t('account'))}">${esc(initials)}</button>
+          <button class="me" data-act="tab" data-tab="account" aria-label="${esc(t('account'))}">${esc(initials)}</button>
         </div>
         <div class="chips chips-scroll">${MAP_CHIPS.map(c => chip('chip', c[0], chipLabel(c), s.chip === c[0], c[0] === 'er' ? 'danger' : '')).join('')}</div>
         ${trv && !bannerDismissed ? `<div class="map-banner" role="note">${icon('plane')}<span>${esc(t('visitorBanner'))}</span><button data-act="dismissBanner" aria-label="${esc(t('close'))}">✕</button></div>` : ''}
@@ -202,15 +202,17 @@ register('search', {
     const q = ctx.s.q || '';
     const n = activeFilterCount(state.filters);
     return `<div class="body">
-      ${appbar({ back: false, big: true, title: t('searchTitle'), sub: t('searchSub'),
-        right: `<button class="btn btn-secondary btn-sm" data-go="filter">${icon('filter')}${esc(t('filter'))}${n ? ` · ${num(n)}` : ''}</button>` })}
+      ${appbar({ back: false, big: true, title: t('searchTitle'), sub: t('searchSub') })}
       <div class="pad" style="margin-bottom:var(--sp-3)">
         <div class="input">${icon('search')}
           <input id="q" type="search" enterkeyhint="search" autocomplete="off" placeholder="${esc(t('searchInputPh'))}" value="${esc(q)}" data-input="q" data-enter="submitQ" aria-label="${esc(t('search'))}">
           ${q ? `<button class="iconbtn" style="width:30px;height:30px;flex-basis:30px;border:0" data-act="clearQ" aria-label="${esc(t('clear'))}">${icon('close')}</button>` : ''}
         </div>
       </div>
-      <div class="scroll pad stack" id="results" data-scroll-id="results">${resultsHtml(q)}</div>
+      <div class="scroll-wrap">
+        <div class="scroll pad stack has-fab" id="results" data-scroll-id="results">${resultsHtml(q)}</div>
+        ${filterFab(n)}
+      </div>
       ${tabbar('search')}
     </div>`;
   },
@@ -239,6 +241,10 @@ registerGlobal('openSpec', (el, ev, ctx) => {
   commit();
   go('doctors');
 });
+
+function filterFab(n, p = '') {
+  return `<button class="fab" data-go="filter" ${p ? `data-p='${p}'` : ''}>${icon('filter')}${esc(t('filter'))}${n ? `<span class="fab-count">${num(n)}</span>` : ''}</button>`;
+}
 
 // ============================================================ 06 REFINE
 const DIST = [[2, '2'], [5, '5'], [10, '10'], [25, '25'], [null, 'any']];
@@ -305,10 +311,13 @@ register('doctors', {
     const title = f.spec ? L(SPECIALTIES[f.spec]) : t('allDoctors');
     const sub = list.length === 1 ? t('oneDocNearest') : t('nDocsNearest', { n: list.length });
     return `<div class="body">
-      ${appbar({ title, sub, right: `<button class="btn btn-secondary btn-sm" data-go="filter" data-p='{"from":"doctors"}'>${esc(t('filter'))}${n ? ` · ${num(n)}` : ''}</button>` })}
+      ${appbar({ title, sub })}
       ${n ? `<div class="pad between" style="margin:-6px 0 10px"><span class="xs">${esc(summary(f))}</span><button class="linkbtn" data-act="clearFilters">${esc(t('clearFilters'))}</button></div>` : ''}
-      <div class="scroll pad stack" data-scroll-id="docs">
-        ${list.length ? list.map(d => doctorCard(d)).join('') : emptyState('user', t('noDoctors'), t('noDoctorsSub'), `<button class="btn btn-secondary btn-sm" data-act="clearFilters">${esc(t('clearFilters'))}</button>`)}
+      <div class="scroll-wrap">
+        <div class="scroll pad stack has-fab" data-scroll-id="docs">
+          ${list.length ? list.map(d => doctorCard(d)).join('') : emptyState('user', t('noDoctors'), t('noDoctorsSub'), `<button class="btn btn-secondary btn-sm" data-act="clearFilters">${esc(t('clearFilters'))}</button>`)}
+        </div>
+        ${filterFab(n, '{"from":"doctors"}')}
       </div>
       ${tabbar('search')}
     </div>`;
@@ -326,6 +335,11 @@ function summary(f) {
   if (f.visit !== 'any') parts.push(t(f.visit === 'video' ? 'video' : 'inPerson'));
   if (f.myIns) parts.push(insName(P().insurance));
   return parts.join(' · ');
+}
+
+/** Square, labelled icon button for the bottom CTA bar (thumb zone). */
+function ctaIcon(act, ic, label, attrs = '', tone = '') {
+  return `<button class="cta-icon ${tone}" data-act="${act}" ${attrs} aria-label="${esc(label)}">${icon(ic)}<span>${esc(label)}</span></button>`;
 }
 
 // ============================================================ FACILITY
@@ -357,10 +371,6 @@ register('facility', {
               <div><div class="h3" style="font-size:14px">${esc(L(f.area))}</div><div class="xs ltr-num" style="margin-top:2px">${esc(f.phone)}</div></div>
               <div style="text-align:end"><div class="dist">${esc(fmtDist(km))}</div><div class="xs">${esc(t('minDrive', { n: driveMin(km) }))}</div></div>
             </div>
-            <div class="row" style="margin-top:var(--sp-3);gap:var(--sp-2)">
-              <button class="btn btn-primary btn-sm grow" data-act="dir" data-fid="${f.id}">${icon('nav')}${esc(t('getDirections'))}</button>
-              <button class="btn btn-ghost btn-sm" data-act="tel" data-tel="${f.phone}">${icon('phone')}${esc(t('callFacility'))}</button>
-            </div>
           </div>
         </div>
         <div>
@@ -370,6 +380,12 @@ register('facility', {
         <div class="divider"></div>
         <div class="h2">${esc(t('facilityDoctors'))} · ${num(docs.length)}</div>
         ${docs.map(d => doctorCard(d, { showFacility: false })).join('')}
+      </div>
+      <div class="footbar">
+        <div class="cta-bar">
+          ${ctaIcon('tel', 'phone', t('callFacility'), `data-tel="${f.phone}"`)}
+          <button class="btn btn-primary btn-lg grow" data-act="dir" data-fid="${f.id}">${icon('nav')}${esc(t('getDirections'))}</button>
+        </div>
       </div>
     </div>`;
   },
@@ -407,10 +423,6 @@ register('doctor', {
               <div class="grow"><div class="h3" style="font-size:14px">${esc(L(d.f))}</div><div class="xs" style="margin-top:2px">${esc(L(d.f.area))}</div></div>
               <div style="text-align:end"><div class="dist">${esc(fmtDist(d.km))}</div><div class="xs">${esc(t('minDrive', { n: driveMin(d.km) }))}</div></div>
             </button>
-            <div class="row" style="gap:var(--sp-2);margin-top:var(--sp-3)">
-              <button class="btn btn-primary btn-sm grow" data-act="dir" data-fid="${d.f.id}">${icon('nav')}${esc(t('getDirections'))}</button>
-              <button class="btn btn-ghost btn-sm" data-act="tel" data-tel="${d.f.phone}" aria-label="${esc(t('callFacility'))}">${icon('phone')}</button>
-            </div>
           </div>
         </div>
         ${ins && bookable ? `<div class="note ${covered ? 'brand' : 'warn'} row" style="gap:8px">${icon(covered ? 'shield' : 'info')}<span>${esc(t(covered ? 'coveredBy' : 'notCovered', { i: insName(ins) }))}</span></div>` : ''}
@@ -430,10 +442,16 @@ register('doctor', {
             <span class="xs">${esc(t('nextAvailable'))}</span>
             <span class="sm" style="font-weight:600;color:var(--content-brand)">${esc(fmtNext(d.next))}</span>
           </div>
-          <button class="btn btn-primary" data-go="slots" data-id="${d.id}" ${d.next ? '' : 'aria-disabled="true"'}>${esc(t('bookAppt'))}</button>`
-        : `<div class="row" style="gap:var(--sp-3)">
-            <button class="btn btn-danger" style="flex:0 0 120px" data-act="tel" data-tel="997">${icon('phone')}${num(997)}</button>
-            <button class="btn btn-primary grow" data-act="dir" data-fid="${d.f.id}">${icon('nav')}${esc(t('getDirections'))}</button></div>`}
+          <div class="cta-bar">
+            ${ctaIcon('dir', 'nav', t('directions'), `data-fid="${d.f.id}"`)}
+            ${ctaIcon('tel', 'phone', t('callFacility'), `data-tel="${d.f.phone}"`)}
+            <button class="btn btn-primary btn-lg grow" data-go="slots" data-id="${d.id}" ${d.next ? '' : 'aria-disabled="true"'}>${icon('calendar')}${esc(t('bookAppt'))}</button>
+          </div>`
+        : `<div class="cta-bar">
+            ${ctaIcon('tel', 'phone', num(997), 'data-tel="997"', 'danger')}
+            ${ctaIcon('tel', 'building', t('callFacility'), `data-tel="${d.f.phone}"`)}
+            <button class="btn btn-primary btn-lg grow" data-act="dir" data-fid="${d.f.id}">${icon('nav')}${esc(t('getDirections'))}</button>
+          </div>`}
       </div>
     </div>`;
   },

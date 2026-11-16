@@ -432,6 +432,32 @@ select.prefix{border-top:0;border-bottom:0;border-inline-start:0;background:tran
   border-top:1px solid var(--border-default);background:var(--surface-card);
 }
 
+/* bottom CTA bar — actions sit in the thumb zone */
+.cta-bar{display:flex;align-items:stretch;gap:var(--sp-2);}
+.btn-lg{min-height:56px;font-size:16px;border-radius:var(--r-md);box-shadow:0 6px 16px -6px color-mix(in srgb,var(--brand-600) 60%,transparent);}
+.cta-icon{
+  flex:0 0 64px;min-height:56px;border-radius:var(--r-md);border:1px solid var(--border-strong);background:var(--surface-card);
+  color:var(--content-brand);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px 2px;
+  font-size:10.5px;font-weight:600;line-height:1.1;
+}
+.cta-icon svg{width:20px;height:20px;}
+.cta-icon span{max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cta-icon:active{background:var(--n-100);}
+.cta-icon.danger{color:var(--danger-600);border-color:#F1C9C4;background:var(--danger-50);}
+.cta-icon:focus-visible{outline:2px solid var(--border-focus);outline-offset:2px;}
+
+/* floating filter button above the tab bar */
+.scroll-wrap{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;}
+.scroll.has-fab{padding-bottom:84px;}
+.fab{
+  position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:5;
+  display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 20px;border-radius:var(--r-pill);border:0;
+  background:var(--brand-800);color:#fff;font-size:14px;font-weight:600;box-shadow:var(--elev-3);
+}
+.fab svg{width:18px;height:18px;}
+.fab-count{min-width:20px;height:20px;border-radius:10px;background:#fff;color:var(--brand-800);font-size:11px;display:grid;place-items:center;padding:0 5px;}
+.fab:focus-visible{outline:2px solid #fff;outline-offset:-4px;}
+
 /* slot picker */
 .days{display:flex;gap:var(--sp-2);}
 .day{flex:1;border:1px solid var(--border-default);border-radius:var(--r-md);background:var(--surface-card);padding:10px 0;text-align:center;}

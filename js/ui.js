@@ -262,6 +262,7 @@ const TABS = [
   ['search', 'search', 'search'],
   ['saved', 'heart', 'saved'],
   ['reports', 'file', 'reports'],
+  ['account', 'user', 'account'],
 ];
 export function tabbar(active) {
   const badge = upcomingBookings().length;
