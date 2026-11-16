@@ -8,9 +8,10 @@ const fire = () => hooks.forEach(fn => { try { fn(); } catch (e) { console.error
 
 export function applyTheme() {
   const trv = state.mode === 'traveler';
-  document.documentElement.dataset.theme = trv ? 'traveler' : 'resident';
+  const doc = state.demoRole === 'doctor';
+  document.documentElement.dataset.theme = doc ? 'doctor' : (state.demoRole && trv ? 'traveler' : 'resident');
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.content = trv ? '#9A4419' : '#006C35';
+  if (meta) meta.content = doc ? '#1B5A8A' : (trv ? '#9A4419' : '#006C35');
   fire();
 }
 

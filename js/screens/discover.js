@@ -6,7 +6,7 @@ import { SPECIALTIES, LANGS, doctorById, facilityById, DOCTORS } from '../data.j
 import {
   here, kmTo, fmtDist, driveMin, areaLabel, facilitiesNear, filterDoctors, activeFilterCount,
   searchAll, doctorsAtFacility, enrichDoctor, openInfo, fmtFee, langsLong, insName, acceptsInsurance,
-  fmtNext, upcomingBookings, relDay, fmtTime, isBookable,
+  fmtNext, upcomingBookings, relDay, fmtTime, isBookable, isAccepting,
 } from '../logic.js';
 import {
   register, go, reset, back, esc, toast, appbar, tabbar, doctorCard, facilityCard, emptyState, avatar,
@@ -462,6 +462,7 @@ register('doctor', {
             </button>
           </div>
         </div>
+        ${bookable && !isAccepting(d.id) ? `<div class="note warn row" style="gap:8px">${icon('clock')}<span>${esc(t('notAccepting'))}</span></div>` : ''}
         ${ins && bookable ? `<div class="note ${covered ? 'brand' : 'warn'} row" style="gap:8px">${icon(covered ? 'shield' : 'info')}<span>${esc(t(covered ? 'coveredBy' : 'notCovered', { i: insName(ins) }))}</span></div>` : ''}
         ${!bookable ? `<div class="note danger row" style="gap:8px;align-items:flex-start">${icon('siren')}<span>${esc(state.lang === 'ar' ? 'قسم الطوارئ — لا حاجة لموعد. توجّه مباشرة، مفتوح ٢٤ ساعة. في الحالات المهددة للحياة اتصل بـ ٩٩٧.' : 'Emergency department — no appointment needed. Walk in, open 24 hours. For life-threatening cases call 997.')}</span></div>` : ''}
         <div>

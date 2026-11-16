@@ -13,6 +13,9 @@ function freshProfile(mode) {
   const iso = d => new Date(now - d * 864e5).toISOString().slice(0, 10);
   return {
     seeded: true,
+    name: mode === 'traveler' ? 'Sarah Thompson' : 'Abdulaziz Al Shammari',
+    gender: mode === 'traveler' ? 'f' : 'm',
+    dob: mode === 'traveler' ? '1990-04-12' : '1986-09-03',
     insurance: mode === 'traveler' ? 'visit' : 'bupa',
     favourites: [],
     consulted: seedConsulted(mode).map(c => ({ doctor: c.doctor, date: iso(c.daysAgo) })),
@@ -30,6 +33,10 @@ function defaults() {
     loc: null,             // { lat, lng, city, source }
     filters: DEFAULT_FILTERS(),
     profiles: {},
+    demoRole: null,        // 'patient' | 'doctor' — demo chooser, not part of the app
+    actingDoctor: 'hana',  // doctor dashboard identity
+    docSettings: {},       // { [doctorId]: { accepting, blocks: [{ id, from, to, allDay, start, end, reason }] } }
+    docMarks: {},          // { [doctorId|date|time]: 'done' | 'noshow' } for demo patients
   };
 }
 
@@ -52,7 +59,11 @@ export function save() {
 export function P() {
   const m = state.mode || 'resident';
   if (!state.profiles[m]) { state.profiles[m] = freshProfile(m); save(); }
-  return state.profiles[m];
+  const p = state.profiles[m];
+  if (p.name === undefined) {                    // data saved before names existed
+    const f = freshProfile(m); p.name = f.name; p.gender = f.gender; p.dob = f.dob; save();
+  }
+  return p;
 }
 
 export function resetAll() {

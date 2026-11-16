@@ -7,7 +7,7 @@ import {
   isoDate, workingDays, slotsFor, nextAvailable, fmtMonth, dayAbbr, fmtDateLong, fmtTime, feeFor, fmtSar,
   makeRef, bookingIcs, downloadFile, parseIso, fmtDateShort, isBookable, fmtWhen,
 } from '../logic.js';
-import { register, go, reset, replace, esc, toast, appbar, avatar, seg, emptyState, saveFile } from '../ui.js';
+import { register, go, reset, replace, esc, toast, appbar, avatar, seg, emptyState, saveFile, editProfileSheet } from '../ui.js';
 
 // ============================================================ 09 SLOT PICKER
 register('slots', {
@@ -58,6 +58,11 @@ register('slots', {
           <div><div class="h2" style="margin-bottom:var(--sp-3)">${esc(t('morning'))}</div>${slotGrid(slots.morning)}</div>
           <div><div class="h2" style="margin-bottom:var(--sp-3)">${esc(t('afternoon'))}</div>${slotGrid(slots.afternoon)}</div>`
         : `<div class="note info">${esc(t('noSlotsDay'))}</div>`}
+        <div class="card row" style="padding:var(--sp-3) var(--sp-4)">
+          <span class="li-ic" style="width:34px;height:34px;border-radius:9px;background:var(--brand-50);color:var(--brand-700);display:grid;place-items:center">${icon('user')}</span>
+          <div class="grow"><div class="xs">${esc(t('patientLabel'))}</div><div class="sm strong">${esc(P().name || t('addYourName'))}</div></div>
+          <button class="linkbtn" data-act="editPatient">${esc(t(P().name ? 'edit' : 'add'))}</button>
+        </div>
         <div class="field">
           <div class="input"><input id="reason" maxlength="120" placeholder="${esc(t('reasonPh'))}" value="${esc(s.reason || '')}" data-input="reason"></div>
           <span class="helper">${esc(t('payAtClinic'))}</span>
@@ -98,9 +103,11 @@ register('slots', {
       ctx.s.date = workingDays(d, ctx.s.weekStart, 1)[0]; ctx.s.time = null;
       ctx.rerender();
     },
+    editPatient: (el, ev, ctx) => editProfileSheet(() => ctx.rerender()),
     confirm: (el, ev, ctx) => {
       const s = ctx.s, d = doctorById(ctx.params.id);
       if (!s.time || s.busy) return;
+      if (!P().name) { editProfileSheet(() => { ctx.rerender(); ctx.$('#confirmBtn')?.click(); }, { required: true }); return; }
       // re-check the slot is still free
       const sl = slotsFor(d, s.date);
       if (![...sl.morning, ...sl.afternoon].some(x => x.time === s.time && x.free)) { toast(t('genericErr')); ctx.rerender(); return; }
@@ -120,7 +127,7 @@ function createBooking(d, s) {
   const b = {
     id: 'b' + Date.now().toString(36), ref: makeRef(), doctor: d.id, facility: d.facility,
     date: s.date, time: s.time, visit: s.visit, fee: feeFor(d, s.visit), reason: (s.reason || '').trim(),
-    status: 'booked', createdAt: Date.now(),
+    status: 'booked', createdAt: Date.now(), patientName: p.name,
   };
   p.bookings.push(b);
   // Consulted list (design: "Dr. Hana has been added to your Consulted list")

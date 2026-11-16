@@ -381,4 +381,34 @@ export function saveFile(name, mime, content, okMsg) {
   }, { title: name });
 }
 
+/** Edit the patient's name, gender and date of birth. Calls done() after a valid save. */
+export function editProfileSheet(done, { required = false } = {}) {
+  const p = P();
+  const f = { name: p.name || '', gender: p.gender || '', dob: p.dob || '' };
+  const today = new Date().toISOString().slice(0, 10);
+  const draw = (err = '') => openSheet(`
+    <div class="stack" style="gap:var(--sp-4)">
+      ${required ? `<div class="note info">${esc(t('nameNeeded'))}</div>` : ''}
+      <div class="field"><label class="label" for="pfName">${esc(t('fullName'))}</label>
+        <div class="input ${err ? 'err' : ''}"><input id="pfName" autocomplete="name" maxlength="60" value="${esc(f.name)}" placeholder="${esc(t('fullNamePh'))}" data-input="pfName" data-enter="pfSave"></div>
+        <span class="helper ${err ? 'err' : ''}">${esc(err || t('nameHelp'))}</span></div>
+      <div class="field"><span class="label">${esc(t('gender'))}</span>${seg('pfGender', [['f', t('female')], ['m', t('male')]], f.gender)}</div>
+      <div class="field"><label class="label" for="pfDob">${esc(t('dob'))}</label>
+        <div class="input"><input id="pfDob" type="date" max="${today}" value="${esc(f.dob)}" data-input="pfDob"></div></div>
+      <button class="btn btn-primary btn-lg" data-act="pfSave">${esc(t(required ? 'saveContinue' : 'save'))}</button>
+    </div>`, {
+    pfName: el => { f.name = el.value; },
+    pfDob: el => { f.dob = el.value; },
+    pfGender: el => { f.gender = el.dataset.v; draw(); setTimeout(() => document.getElementById('pfName')?.blur(), 0); },
+    pfSave: () => {
+      const name = f.name.trim().replace(/\s+/g, ' ');
+      if (name.length < 3 || !/\s/.test(name)) return draw(t('errFullName'));
+      Object.assign(p, { name, gender: f.gender, dob: f.dob });
+      commit(); closeOverlay(); toast(t('profileSaved'));
+      done?.();
+    },
+  }, { title: t(required ? 'whoIsVisit' : 'editProfile') });
+  draw();
+}
+
 export { commit };

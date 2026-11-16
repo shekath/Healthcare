@@ -84,6 +84,20 @@
   --frame-bg:#EEE5DD;
 }
 
+/* ------------------------------------------------------------
+   DOCTOR THEME — clinician blue for the doctor dashboard demo.
+   White on brand-600 = 7.3:1, brand-700 on white = 9.6:1.
+   ------------------------------------------------------------ */
+[data-theme="doctor"]{
+  --brand-900:#0B2A44; --brand-800:#10395C; --brand-700:#154A75;
+  --brand-600:#1B5A8A; --brand-500:#2A73AD; --brand-300:#8DB8DC;
+  --brand-100:#D5E6F4; --brand-50:#EEF5FB;
+  --brand-accent:#8FD0FF; --brand-on-dark:#D5E6F4; --brand-on-dark-2:#A9CBE6;
+  --n-900:#0F1720; --n-800:#1C2733; --n-700:#384656; --n-600:#56667A; --n-500:#748499;
+  --n-400:#A3B0BF; --n-300:#C9D2DC; --n-200:#E2E8EE; --n-100:#F0F4F8; --n-50:#F7F9FB;
+  --map-ground:#DCE5EE; --frame-bg:#E4EAF0;
+}
+
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 /* default icon size; component rules below override */
 svg:not([width]){width:18px;height:18px;flex-shrink:0;}
@@ -415,6 +429,57 @@ select.prefix{border-top:0;border-bottom:0;border-inline-start:0;background:tran
 @keyframes nvShineRtl{0%,10%{transform:translateX(110%);}60%,100%{transform:translateX(-110%);}}
 @keyframes nvDrift{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
 @keyframes nvPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--brand-accent) 70%,transparent);}100%{box-shadow:0 0 0 8px transparent;}}
+
+/* demo use-case chooser (demo device, not part of the app) */
+.demo-tag{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-xs);font-weight:600;color:var(--warn-600);background:var(--warn-50);border:1px dashed #E2C58C;border-radius:var(--r-pill);padding:5px 10px;}
+.demo-tag svg{width:14px;height:14px;}
+.wordmark.demo-wordmark{color:var(--n-900);font-size:34px;}
+.wordmark.demo-wordmark i{color:#0B8A48;}
+.usecase{display:flex;align-items:center;gap:var(--sp-4);width:100%;text-align:start;padding:var(--sp-4);border-radius:var(--r-lg);
+  background:var(--surface-card);border:1.5px solid var(--border-default);box-shadow:var(--elev-1);transition:border-color .2s,box-shadow .2s,transform .1s;}
+.usecase:active{transform:scale(.99);}
+.usecase .grow{display:flex;flex-direction:column;gap:3px;}
+.usecase .chev{color:var(--n-400);} [dir="rtl"] .usecase .chev{transform:scaleX(-1);}
+.uc-ic{width:52px;height:52px;flex:0 0 52px;border-radius:14px;display:grid;place-items:center;color:#fff;}
+.uc-ic svg{width:26px;height:26px;}
+.uc-patient .uc-ic{background:linear-gradient(150deg,#00381B,#0B8A48);}
+.uc-doctor .uc-ic{background:linear-gradient(150deg,#0B2A44,#2A73AD);}
+.uc-patient:hover{border-color:#006C35;box-shadow:0 0 0 3px #D6EDE0;}
+.uc-doctor:hover{border-color:#1B5A8A;box-shadow:0 0 0 3px #D5E6F4;}
+.uc-pts{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+.uc-pts i{font-style:normal;font-size:var(--fs-xs);font-weight:500;padding:3px 8px;border-radius:var(--r-pill);background:var(--n-100);color:var(--n-700);}
+
+/* doctor dashboard */
+.status-pill{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:var(--r-pill);font-size:var(--fs-xs);font-weight:600;border:1px solid;white-space:nowrap;}
+.status-pill i{width:8px;height:8px;border-radius:50%;background:currentColor;}
+.status-pill.on{color:#0B6B3A;background:#EAF7EF;border-color:#BFE5CD;}
+.status-pill.on i{animation:nvPulse 1.8s ease-out infinite;}
+.status-pill.off{color:var(--warn-600);background:var(--warn-50);border-color:#EFD9AE;}
+.stat-row{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:var(--sp-2);}
+.stat{background:var(--surface-card);border:1px solid var(--border-default);border-radius:var(--r-md);padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0;}
+.stat b{font-size:20px;font-weight:600;color:var(--content-brand);font-variant-numeric:tabular-nums;line-height:1.2;}
+.stat span{font-size:var(--fs-xs);color:var(--content-tertiary);}
+.day .day-count{margin:4px auto 0;min-width:20px;height:18px;border-radius:9px;font-size:10.5px;font-weight:600;display:grid;place-items:center;background:var(--brand-50);color:var(--brand-700);padding:0 5px;width:max-content;}
+.day.on .day-count{background:rgba(255,255,255,.22);color:#fff;}
+.sched-row{display:flex;align-items:stretch;gap:var(--sp-3);width:100%;background:none;border:0;padding:0;text-align:start;}
+.sched-time{flex:0 0 46px;font-size:var(--fs-sm);font-weight:600;color:var(--content-secondary);padding-top:12px;font-variant-numeric:tabular-nums;}
+.sched-card{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;background:var(--surface-card);border:1px solid var(--border-default);
+  border-inline-start:3px solid var(--brand-500);border-radius:var(--r-md);padding:10px 12px;}
+.sched-card.real{border-inline-start-color:#0B8A48;background:linear-gradient(90deg,#F2FAF5,var(--surface-card) 40%);}
+[dir="rtl"] .sched-card.real{background:linear-gradient(270deg,#F2FAF5,var(--surface-card) 40%);}
+.sched-card.muted{opacity:.6;}
+.sched-card.free,.sched-card.blocked{flex-direction:row;align-items:center;gap:8px;font-size:var(--fs-sm);color:var(--content-tertiary);padding:10px 12px;}
+.sched-card.free{border:1.5px dashed var(--border-strong);background:transparent;}
+.sched-card.blocked{border:1px solid var(--n-200);background:repeating-linear-gradient(135deg,var(--n-100) 0 8px,var(--n-50) 8px 16px);color:var(--n-600);}
+.sched-card svg{width:16px;height:16px;}
+.sched-row:active .sched-card{border-color:var(--border-brand);}
+.hist-row{display:flex;align-items:center;gap:var(--sp-3);padding:10px 0;border-bottom:1px solid var(--border-default);}
+.hist-row:last-child{border-bottom:0;}
+.hist-dot{width:10px;height:10px;border-radius:50%;background:var(--n-300);flex:0 0 10px;}
+.hist-dot.up{background:var(--brand-600);box-shadow:0 0 0 3px var(--brand-100);}
+.textarea{width:100%;border:1px solid var(--border-strong);border-radius:var(--r-md);padding:10px 12px;font:inherit;font-size:15px;resize:vertical;min-height:80px;background:var(--surface-card);}
+.textarea:focus{outline:0;border-color:var(--border-brand);box-shadow:0 0 0 3px var(--brand-100);}
+.tag svg{width:12px;height:12px;}
 
 /* nearby-care card with a directions button */
 .fcard{padding:var(--sp-3);}

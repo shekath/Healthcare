@@ -17,6 +17,21 @@ Then open <http://localhost:8080>.
 - **On a phone:** open the URL on the same Wi-Fi (`http://<your-computer-ip>:8080`). It runs full-screen, and *Add to Home Screen* installs it as an app (PWA, works offline after the first load).
 - **On a desktop:** the app shows inside a phone frame, with a demo panel beside it for switching Resident/Traveler, English/Arabic, and resetting the data.
 
+## Demo: patient or doctor
+
+The demo opens on a **Choose a use case** screen. It is labelled *Demo only* and is not part of the patient app.
+
+- **Patient app:** everything described below.
+- **Doctor dashboard:** what a doctor sees, in a clinician-blue theme with its own bottom tabs:
+  - **Schedule:** today's numbers (patients, repeat patients, next patient) and a strip of working days with a count of appointments on each. Each slot shows the patient's name, age and gender, the reason for the visit, and tags: *New* / *Repeat · n visits*, *Visitor*, *Video*, and *QRIB app* for bookings made in the patient app. Tap a patient to mark them seen (with a visit note that becomes the patient's visit summary), mark a no-show, call them, or cancel. Tap a free slot to block it or the whole day.
+  - **Patients:** every patient from the last 30 days and the next 14, with search and *All / Repeat / New* filters, and a visit history for each.
+  - **Availability:** a switch to pause or resume all new bookings; quick blocks (rest of today, tomorrow, next week); and custom blocks for full days, a date range, or a time range across days, with an optional reason.
+  - **Profile:** choose which doctor to act as, change the language, and switch use case.
+
+Both sides share the same data on the device. A patient booking appears on that doctor's schedule under the patient's name. When the doctor blocks time or pauses bookings, those slots disappear from the patient's slot picker. When the doctor marks a visit as seen, the patient's pending report becomes a visit summary with the doctor's note. When the doctor cancels, the patient sees a notice in Saved.
+
+You can switch use case from **Account** (patient), **Profile** (doctor), or the desktop demo panel.
+
 ## Resident vs Traveler
 
 The app opens on a green splash screen, then the sign-in screen. On sign-in, an **“I’m a traveler / visitor”** switch at the top turns on Traveler mode, and the theme changes straight away:
@@ -69,6 +84,7 @@ You can switch later in **Account** (each profile keeps its own data). Every col
   - Uses the Saudi working week (Sun–Thu; some doctors also Sat).
   - Past slots and slots you've already booked are disabled; the next available slot is preselected.
   - Week paging, in-person or video visit, and an optional reason for the visit.
+  - Shows who the visit is for. If no name is saved, the app asks for one before booking.
 - **10** Confirmation:
   - Shows a `QRB-#####` reference.
   - Directions, and an `.ics` calendar file with a 1-hour reminder.
@@ -81,7 +97,7 @@ You can switch later in **Account** (each profile keeps its own data). Every col
   - A detail view for each record (lab table with high values flagged).
   - Share, download, or export all records as HTML.
   - Each new booking adds a pending visit summary.
-- Account (fifth bottom tab): profile type, language, insurance, city/GPS, emergency numbers, privacy notice, sign out, reset demo data.
+- Account (fifth bottom tab): the patient's full name, gender and date of birth (editable; doctors see the name, age and phone), profile type, language, insurance, city/GPS, emergency numbers, privacy notice, sign out, reset demo data.
 
 **Throughout:** full English/Arabic with RTL layout and Arabic-Indic digits (as in the design); data persists across reloads; the Android back button works; layout respects iPhone notch/safe areas; reduced-motion is respected.
 

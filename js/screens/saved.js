@@ -59,8 +59,12 @@ register('saved', {
     let body;
     if (s.tab === 'consulted') {
       const up = upcomingBookings();
+      const byClinic = p.bookings.filter(b => b.cancelledBy === 'clinic' && !b.seen);
       const list = p.consulted.map(c => ({ c, d: doctorById(c.doctor) })).filter(x => x.d);
       body = `
+        ${byClinic.map(b => `<div class="note warn row" style="gap:10px;align-items:flex-start">${icon('alert')}
+          <span class="grow">${esc(t('clinicCancelled', { d: L(doctorById(b.doctor).name), w: fmtWhen(b.date, b.time) }))}</span>
+          <button class="linkbtn" data-act="ackCancel" data-id="${b.id}">${esc(t('ok'))}</button></div>`).join('')}
         ${up.length ? `<div class="sec-h">${esc(t('upcoming'))} · ${num(up.length)}</div>${up.map(upcomingCard).join('')}<div class="sec-h" style="margin-top:var(--sp-3)">${esc(t('consulted'))}</div>` : ''}
         ${list.length ? `<p class="xs">${esc(t('consultedSub'))}</p>` + list.map(({ c, d }) => savedDoctorCard(enrichDoctor(d), t('lastSeen', { s: L(SPECIALTIES[d.spec]), d: fmtDate(c.date) }))).join('')
           : emptyState('calendar', t('noConsulted'), t('noConsultedSub'), `<button class="btn btn-primary btn-sm" data-act="tab" data-tab="search">${esc(t('findDoctor'))}</button>`)}`;
@@ -79,6 +83,7 @@ register('saved', {
   },
   actions: {
     savedTab: (el, ev, ctx) => { ctx.s.tab = el.dataset.v; ctx.rerender(); },
+    ackCancel: (el, ev, ctx) => { const b = P().bookings.find(x => x.id === el.dataset.id); if (b) { b.seen = true; commit(); } ctx.rerender(); },
     cancelBooking: async (el, ev, ctx) => {
       const p = P(), b = p.bookings.find(x => x.id === el.dataset.id);
       if (!b) return;

@@ -68,10 +68,22 @@ export function openInfo(f, d = new Date()) {
 }
 
 // ---------- deterministic slot generation
-function hash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
-function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t2 = Math.imul(seed ^ seed >>> 15, 1 | seed); t2 = t2 + Math.imul(t2 ^ t2 >>> 7, 61 | t2) ^ t2; return ((t2 ^ t2 >>> 14) >>> 0) / 4294967296; }; }
+export function hash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+export function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t2 = Math.imul(seed ^ seed >>> 15, 1 | seed); t2 = t2 + Math.imul(t2 ^ t2 >>> 7, 61 | t2) ^ t2; return ((t2 ^ t2 >>> 14) >>> 0) / 4294967296; }; }
 
 export const isBookable = doc => doc.spec !== 'emerg';
+
+// ---------- doctor-side availability (shared by the patient app and the doctor dashboard)
+export const docSettings = id => state.docSettings[id] || { accepting: true, blocks: [] };
+export const isAccepting = id => docSettings(id).accepting !== false;
+/** The block covering this slot, if the doctor has blocked it. */
+export function blockFor(id, iso, time) {
+  return docSettings(id).blocks.find(b => iso >= b.from && iso <= b.to && (b.allDay || (time >= b.start && time < b.end))) || null;
+}
+/** Bookings from every patient profile on this device (resident and traveler). */
+export function allBookings() {
+  return Object.entries(state.profiles).flatMap(([mode, p]) => (p.bookings || []).map(b => ({ ...b, mode, patient: p })));
+}
 
 /** Saudi working week Sun–Thu; some doctors also work Saturday. */
 export function worksOn(doc, date) {
@@ -88,12 +100,14 @@ export function slotsFor(doc, iso) {
   const r = rng(hash(doc.id + iso));
   const today = isoDate(new Date()) === iso;
   const cutoff = nowMin() + 30;
-  const taken = new Set(P().bookings.filter(b => b.doctor === doc.id && b.date === iso && b.status !== 'cancelled').map(b => b.time));
+  const taken = new Set(allBookings().filter(b => b.doctor === doc.id && b.date === iso && b.status !== 'cancelled').map(b => b.time));
+  const accepting = isAccepting(doc.id);
   for (const part of ['morning', 'afternoon']) {
     for (const time of SLOT_TIMES[part]) {
       let free = r() > 0.32;
       if (today && toMin(time) <= cutoff) free = false;
       if (taken.has(time)) free = false;
+      if (!accepting || blockFor(doc.id, iso, time)) free = false;
       out[part].push({ time, free });
     }
   }
@@ -101,7 +115,7 @@ export function slotsFor(doc, iso) {
 }
 
 export function nextAvailable(doc, days = 14) {
-  if (!isBookable(doc)) return null;
+  if (!isBookable(doc) || !isAccepting(doc.id)) return null;
   const d = new Date();
   for (let i = 0; i < days; i++) {
     const iso = isoDate(d);

@@ -4,7 +4,7 @@ import { t, L, num } from '../i18n.js';
 import { icon } from '../icons.js';
 import { cityById, RESIDENT_INSURERS, TRAVELER_INSURERS } from '../data.js';
 import { nearestEr, fmtDist, directionsUrl, openExternal, insName } from '../logic.js';
-import { register, reset, esc, toast, appbar, tabbar, seg, openSheet, closeOverlay, confirmDialog, registerGlobal, modeBadge } from '../ui.js';
+import { register, reset, esc, toast, appbar, tabbar, seg, openSheet, closeOverlay, confirmDialog, registerGlobal, modeBadge, editProfileSheet } from '../ui.js';
 import { setLang, setMode } from '../shell.js';
 import { chooseCitySheet, useGps } from './auth.js';
 
@@ -20,17 +20,24 @@ register('account', {
     const loc = state.loc;
     const locLabel = loc ? (loc.source === 'gps' ? `GPS · ${L(cityById(loc.city))}` : L(cityById(loc.city))) : '—';
     const v = state.session?.value || '';
-    const init = (v.replace(/[^A-Za-z؀-ۿ]/g, '').slice(0, 1) || 'Q').toUpperCase();
+    const pr = P();
+    const age = pr.dob ? Math.floor((Date.now() - new Date(pr.dob)) / 31557600000) : null;
+    const init = ((pr.name || v).replace(/[^A-Za-z\u0600-\u06FF\s]/g, '').trim().split(/\s+/).filter(w => !/^(Al|ال)$/.test(w)).slice(0, 2).map(w => w[0]).join('') || 'Q').toUpperCase();
     return `<div class="body">
       ${appbar({ back: false, big: true, title: t('account') })}
       <div class="scroll pad stack" style="gap:var(--sp-4)">
-        <div class="card row">
-          <div class="avatar lg">${esc(init)}</div>
-          <div class="grow">
-            <div class="h2 ellipsis ltr-num" style="max-width:100%">${esc(v || t('profile'))}</div>
-            <div class="xs" style="margin:3px 0 8px">${esc(t('signedInAs', { v: state.session?.method === 'email' ? t('email') : state.session?.method === 'phone' ? t('phone') : (state.session?.method || '').replace(/^./, c => c.toUpperCase()) }))}</div>
-            ${modeBadge()}
+        <div class="card">
+          <div class="row" style="align-items:flex-start">
+            <div class="avatar lg">${esc(init)}</div>
+            <div class="grow">
+              <div class="h2">${esc(pr.name || t('addYourName'))}</div>
+              <div class="xs" style="margin-top:3px">${esc([pr.gender === 'f' ? t('female') : pr.gender === 'm' ? t('male') : '', age ? t('ageY', { n: age }) : ''].filter(Boolean).join(' · '))}</div>
+              <div class="xs ltr-num" style="margin-top:2px">${esc(v)}</div>
+              <div style="margin-top:8px">${modeBadge()}</div>
+            </div>
           </div>
+          <div class="note info row" style="gap:8px;margin-top:var(--sp-3)">${icon('stethoscope')}<span>${esc(t('nameVisible'))}</span></div>
+          <button class="btn btn-secondary btn-sm" style="width:100%;margin-top:var(--sp-3)" data-act="editProfile">${icon('user')}${esc(t('editProfile'))}</button>
         </div>
 
         <div class="field"><span class="label">${esc(t('profileType'))}</span>
@@ -49,6 +56,7 @@ register('account', {
         <div class="list">
           ${li('sos', 'phone', t('emergencyNumbers'), num('997 · 911'))}
           ${li('privacy', 'lock', t('privacy'))}
+          ${li('switchUseCase', 'stethoscope', t('switchUseCase'))}
           ${li('resetDemo', 'refresh', t('resetDemo'))}
           ${li('signOut', 'logout', t('signOut'), '', true)}
         </div>
@@ -64,6 +72,7 @@ register('account', {
       toast(t('switchedTo', { m: t(el.dataset.v === 'traveler' ? 'travelerMode' : 'residentMode') }));
     },
     setLang: el => setLang(el.dataset.v),
+    editProfile: (el, ev, ctx) => editProfileSheet(() => ctx.rerender()),
     pickIns: (el, ev, ctx) => {
       const list = [...(state.mode === 'traveler' ? TRAVELER_INSURERS : RESIDENT_INSURERS), null];
       const cur = P().insurance;
