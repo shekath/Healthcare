@@ -19,7 +19,7 @@ Then open <http://localhost:8080>.
 
 ## Resident vs Traveler
 
-Before sign-in, the user chooses **Saudi resident** or **Traveler / visitor**. The theme changes straight away:
+The app opens on the sign-in screen. An **“I’m a traveler / visitor”** switch at the top turns on Traveler mode, and the theme changes straight away:
 
 | | Resident | Traveler |
 |---|---|---|
@@ -33,9 +33,7 @@ You can switch later in **Account** (each profile keeps its own data). Every col
 ## What works
 
 **Entry and identity**
-- **01** Splash, with a language switch.
-- New profile-type step (Resident or Traveler).
-- **02** Sign in, with validation:
+- **01–02** Sign in is the first screen. It combines the splash (brand header, tagline, language switch) with the sign-in form, plus the traveler switch. It has validation:
   - Saudi numbers must be `5XXXXXXXX`; international numbers 6–14 digits; email checked too.
   - SSO options are simulated, and Nafath shows a number-matching step.
 - **03** OTP:

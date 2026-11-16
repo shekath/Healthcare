@@ -25,6 +25,9 @@ const S = {
     travelerMode: 'Traveler mode',
 
     // sign in
+    imTraveler: 'I’m a traveler / visitor',
+    travelerOffSub: 'Turn on if you’re visiting Saudi Arabia',
+    travelerOnSub: 'Traveler mode · international numbers and travel insurance',
     signIn: 'Sign in',
     signInSub: 'We’ll send a 4-digit code to confirm it’s you.',
     phone: 'Phone',
@@ -330,6 +333,9 @@ const S = {
     residentMode: 'وضع المقيم',
     travelerMode: 'وضع المسافر',
 
+    imTraveler: 'أنا مسافر / زائر',
+    travelerOffSub: 'فعّله إذا كنت تزور المملكة',
+    travelerOnSub: 'وضع المسافر · أرقام دولية وتأمين السفر',
     signIn: 'تسجيل الدخول',
     signInSub: 'سنرسل رمزًا من ٤ أرقام للتأكد من هويتك.',
     phone: 'رقم الجوال',

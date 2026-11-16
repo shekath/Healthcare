@@ -1,78 +1,14 @@
-// Stage 1 — Entry and identity: splash, profile type (new), sign in, OTP, location.
+// Stage 1 — Entry and identity: sign in (with traveler switch), OTP, location.
 import { state, commit, P } from '../store.js';
-import { t, L, num, STRINGS } from '../i18n.js';
+import { t, L, num } from '../i18n.js';
 import { icon } from '../icons.js';
 import { CITIES, COUNTRY_CODES, cityById } from '../data.js';
 import { haversine } from '../logic.js';
 import { register, go, reset, back, esc, toast, openSheet, closeOverlay, appbar } from '../ui.js';
 import { applyTheme, toggleLang } from '../shell.js';
 
-// ------------------------------------------------------------ 01 splash
-register('splash', {
-  edge: true, onBrand: true,
-  render: () => `
-    <div class="body"><div class="splash">
-      <div class="stack" style="gap:0">
-        <button class="lang-pill" data-act="toggleLang" style="margin-top:36px">${esc(t('langToggle'))}</button>
-        <div style="margin-top:96px">
-          <div class="wordmark" aria-label="QRIB">QR<i>Ī</i>B</div>
-          <p style="font-size:17px;color:var(--brand-on-dark);margin-top:var(--sp-3);line-height:1.55;max-width:26ch">${esc(t('appTagline'))}</p>
-        </div>
-      </div>
-      <div class="stack">
-        <button class="btn" style="background:#fff;color:var(--brand-800)" data-go="who">${esc(t('getStarted'))}</button>
-        <button class="btn" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.45)" data-go="who" data-p='{"returning":true}'>${esc(t('haveAccount'))}</button>
-        <p style="text-align:center;font-size:var(--fs-xs);color:var(--brand-on-dark-2);margin-top:var(--sp-2)">${esc(t('licensedOnly'))}</p>
-      </div>
-    </div></div>`,
-});
-
-// ------------------------------------------------------------ profile type (new)
-const ptypeCard = (mode, on) => {
-  const res = mode === 'resident';
-  const pts = STRINGS[state.lang][res ? 'residentPts' : 'travelerPts'];
-  const sw = res ? ['#00381B', '#006C35', '#7FC49E', '#EFF8F3'] : ['#3D1A0A', '#9A4419', '#E3A783', '#FCF1EA'];
-  return `<button class="ptype ${res ? 'res' : 'trv'} ${on ? 'on' : ''}" role="radio" aria-checked="${on}" data-act="pickMode" data-v="${mode}">
-    <div class="ic">${icon(res ? 'home' : 'plane')}</div>
-    <div class="grow">
-      <div class="between"><span class="h3">${esc(t(res ? 'resident' : 'traveler'))}</span><span class="radio"></span></div>
-      <div class="xs" style="margin-top:3px;line-height:1.5">${esc(t(res ? 'residentDesc' : 'travelerDesc'))}</div>
-      <ul>${pts.map(p => `<li>${esc(p)}</li>`).join('')}</ul>
-      <div class="swatches" aria-hidden="true">${sw.map(c => `<i style="background:${c}"></i>`).join('')}</div>
-    </div>
-  </button>`;
-};
-
-register('who', {
-  render: ctx => `
-    <div class="body">
-      ${appbar({ right: `<button class="btn btn-ghost btn-sm" data-act="toggleLang">${esc(t('langToggle'))}</button>` })}
-      <div class="scroll pad stack" style="gap:var(--sp-4)">
-        <div>
-          <h2 class="h-display">${esc(t(ctx.params.returning ? 'whoTitleBack' : 'whoTitle'))}</h2>
-          <p class="body-t" style="margin-top:6px">${esc(t('whoSub'))}</p>
-        </div>
-        <div class="stack" role="radiogroup">
-          ${ptypeCard('resident', state.mode !== 'traveler')}
-          ${ptypeCard('traveler', state.mode === 'traveler')}
-        </div>
-        <div class="note brand row" style="gap:10px;align-items:flex-start">${icon('info')}<span>${esc(t('themeNote'))}</span></div>
-      </div>
-      <div class="footbar"><button class="btn btn-primary" data-act="continue">${esc(t('continue'))}</button></div>
-    </div>`,
-  mount: () => { if (!state.mode) { state.mode = 'resident'; applyTheme(); commit(); } },
-  actions: {
-    pickMode: (el, ev, ctx) => {
-      state.mode = el.dataset.v;
-      applyTheme();
-      commit();
-      ctx.rerender();
-    },
-    continue: () => go('signin'),
-  },
-});
-
-// ------------------------------------------------------------ 02 sign in
+// ------------------------------------------------------------ 01 sign in (app entry)
+// Opens the app. A switch picks Traveler mode, which changes the theme live.
 const SA_RE = /^5\d{8}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -89,6 +25,7 @@ function displayPhone(cc, raw) {
 }
 
 register('signin', {
+  edge: true, onBrand: true,
   render: ctx => {
     const s = ctx.s;
     const trv = state.mode === 'traveler';
@@ -111,36 +48,58 @@ register('signin', {
           <span class="helper ${s.err ? 'err' : ''}" id="help">${esc(s.err || t('emailHelp'))}</span>
         </div>`;
     return `<div class="body">
-      ${appbar({ right: `<span class="mode-badge">${icon(trv ? 'plane' : 'home')}${esc(t(trv ? 'travelerMode' : 'residentMode'))}</span>` })}
-      <div class="scroll pad stack" style="gap:var(--sp-5)">
-        <div>
-          <h2 class="h-display">${esc(t('signIn'))}</h2>
-          <p class="body-t" style="margin-top:6px">${esc(s.method === 'email' ? t('emailHelp') : t('signInSub'))}</p>
+      <div class="scroll" style="padding-bottom:0" data-scroll-id="login">
+        <header class="login-hero">
+          <div class="between">
+            <div class="wordmark" aria-label="QRIB">QR<i>Ī</i>B</div>
+            <button class="lang-pill" data-act="toggleLang">${esc(t('langToggle'))}</button>
+          </div>
+          <p class="hero-tag">${esc(t('appTagline'))}</p>
+        </header>
+        <div class="login-card stack">
+          <button class="trv-toggle ${trv ? 'on' : ''}" role="switch" aria-checked="${trv}" data-act="toggleTraveler" id="trvToggle">
+            <span class="ic">${icon('plane')}</span>
+            <span class="grow"><span class="h3">${esc(t('imTraveler'))}</span><span class="xs">${esc(t(trv ? 'travelerOnSub' : 'travelerOffSub'))}</span></span>
+            <span class="switch" aria-hidden="true"><i></i></span>
+          </button>
+          <div>
+            <h2 class="h1">${esc(t('signIn'))}</h2>
+            <p class="sm" style="margin-top:4px">${esc(s.method === 'email' ? t('emailHelp') : t('signInSub'))}</p>
+          </div>
+          <div class="seg" role="tablist">
+            <button class="${s.method === 'phone' ? 'on' : ''}" data-act="method" data-v="phone">${esc(t('phone'))}</button>
+            <button class="${s.method === 'email' ? 'on' : ''}" data-act="method" data-v="email">${esc(t('email'))}</button>
+          </div>
+          ${field}
+          <button class="btn btn-primary" data-act="send" id="sendBtn">${esc(t('sendCode'))}</button>
+          <div class="row" style="gap:var(--sp-3)"><span class="divider grow"></span><span class="xs">${esc(t('orContinue'))}</span><span class="divider grow"></span></div>
+          <div class="row" style="gap:var(--sp-3)">
+            ${trv ? '' : `<button class="btn btn-ghost" style="flex:1" data-act="sso" data-v="nafath">${esc(t('nafath'))}</button>`}
+            <button class="btn btn-ghost" style="flex:1" data-act="sso" data-v="apple">Apple</button>
+            <button class="btn btn-ghost" style="flex:1" data-act="sso" data-v="google">Google</button>
+          </div>
+          ${trv ? `<p class="xs" style="text-align:center;margin-top:-6px">${esc(t('nafathNote'))}</p>` : ''}
+          <p class="xs" style="line-height:1.6;text-align:center">${esc(t('terms'))}</p>
+          <p class="xs" style="text-align:center;color:var(--content-brand);font-weight:500">${icon('shield')} ${esc(t('licensedOnly'))}</p>
         </div>
-        <div class="seg" role="tablist">
-          <button class="${s.method === 'phone' ? 'on' : ''}" data-act="method" data-v="phone">${esc(t('phone'))}</button>
-          <button class="${s.method === 'email' ? 'on' : ''}" data-act="method" data-v="email">${esc(t('email'))}</button>
-        </div>
-        ${field}
-        <button class="btn btn-primary" data-act="send" id="sendBtn">${esc(t('sendCode'))}</button>
-        <div class="row" style="gap:var(--sp-3)"><span class="divider grow"></span><span class="xs">${esc(t('orContinue'))}</span><span class="divider grow"></span></div>
-        <div class="row" style="gap:var(--sp-3)">
-          ${trv ? '' : `<button class="btn btn-ghost" style="flex:1" data-act="sso" data-v="nafath">${esc(t('nafath'))}</button>`}
-          <button class="btn btn-ghost" style="flex:1" data-act="sso" data-v="apple">Apple</button>
-          <button class="btn btn-ghost" style="flex:1" data-act="sso" data-v="google">Google</button>
-        </div>
-        ${trv ? `<p class="xs" style="text-align:center;margin-top:-8px">${esc(t('nafathNote'))}</p>` : ''}
-        <p class="xs" style="line-height:1.6;text-align:center">${esc(t('terms'))}</p>
       </div>
     </div>`;
   },
-  mount: ctx => { setTimeout(() => ctx.$('#phone,#email')?.focus({ preventScroll: true }), 320); },
+  mount: () => { if (!state.mode) { state.mode = 'resident'; applyTheme(); commit(); } },
   inputs: {
     phone: (el, ev, ctx) => { ctx.s.phone = el.value; clearErr(ctx); },
     email: (el, ev, ctx) => { ctx.s.email = el.value; clearErr(ctx); },
     cc: (el, ev, ctx) => { ctx.s.cc = el.value; ctx.s.err = null; ctx.rerender(); },
   },
   actions: {
+    toggleTraveler: (el, ev, ctx) => {
+      state.mode = state.mode === 'traveler' ? 'resident' : 'traveler';
+      applyTheme();
+      commit();
+      ctx.s.err = null;
+      ctx.rerender();
+      ctx.$('#trvToggle')?.focus({ preventScroll: true });
+    },
     method: (el, ev, ctx) => { ctx.s.method = el.dataset.v; ctx.s.err = null; ctx.rerender(); setTimeout(() => ctx.$('#phone,#email')?.focus(), 30); },
     send: (el, ev, ctx) => {
       const s = ctx.s;
