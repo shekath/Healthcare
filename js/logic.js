@@ -231,10 +231,15 @@ export function upcomingBookings() {
 // ---------- links & files
 export const directionsUrl = f => `https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lng}`;
 export function openExternal(url) {
-  try { const w = window.open(url, '_blank', 'noopener'); if (!w) location.href = url; } catch { location.href = url; }
+  // A real link click works in browsers, installed PWAs and sandboxed frames.
+  const a = document.createElement('a');
+  a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+  document.body.appendChild(a); a.click(); a.remove();
 }
+export const isEmbedded = () => { try { return window.top !== window.self; } catch { return true; } };
 
 export function downloadFile(name, mime, content) {
+  if (isEmbedded()) return false;   // sandboxed frames block downloads
   try {
     const blob = new Blob([content], { type: mime });
     const url = URL.createObjectURL(blob);

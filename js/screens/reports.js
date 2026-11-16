@@ -4,7 +4,7 @@ import { t, L, num } from '../i18n.js';
 import { icon } from '../icons.js';
 import { doctorById, facilityById } from '../data.js';
 import { fmtDate, downloadFile } from '../logic.js';
-import { register, esc, toast, appbar, tabbar, emptyState, chip } from '../ui.js';
+import { register, esc, toast, appbar, tabbar, emptyState, chip, saveFile } from '../ui.js';
 
 const TYPE = {
   visit: { ic: 'PDF', cls: '', filter: 'visits' },
@@ -68,8 +68,7 @@ register('reports', {
   actions: {
     rf: (el, ev, ctx) => { ctx.s.f = el.dataset.v; ctx.rerender(); },
     exportAll: () => {
-      const ok = downloadFile('QRIB-health-records.html', 'text/html', exportHtml(sorted().filter(r => !r.pending)));
-      toast(ok ? t('exported') : t('genericErr'));
+      saveFile('QRIB-health-records.html', 'text/html', exportHtml(sorted().filter(r => !r.pending)), t('exported'));
     },
   },
 });
@@ -125,8 +124,7 @@ register('report', {
   actions: {
     dlRep: (el, ev, ctx) => {
       const r = P().reports.find(x => x.id === ctx.params.id);
-      const ok = downloadFile(`QRIB-${r.id}.html`, 'text/html', exportHtml([r]));
-      toast(ok ? t('exported') : t('genericErr'));
+      saveFile(`QRIB-${r.id}.html`, 'text/html', exportHtml([r]), t('exported'));
     },
     shareRep: async (el, ev, ctx) => {
       const r = P().reports.find(x => x.id === ctx.params.id);

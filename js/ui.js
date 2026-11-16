@@ -3,7 +3,7 @@ import { state, P, commit } from './store.js';
 import { t, L, num } from './i18n.js';
 import { icon } from './icons.js';
 import { SPECIALTIES } from './data.js';
-import { fmtDist, fmtNext, langsShort, openInfo, upcomingBookings } from './logic.js';
+import { fmtDist, fmtNext, langsShort, openInfo, upcomingBookings, downloadFile } from './logic.js';
 
 export const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -332,6 +332,21 @@ export function seg(name, options, value, extra = '') {
 
 export function chip(act, v, label, on, cls = '') {
   return `<button class="chip-f ${on ? 'on' : ''} ${cls}" aria-pressed="${!!on}" data-act="${act}" data-v="${v}">${esc(label)}</button>`;
+}
+
+/** Download a file; where downloads are blocked, offer the content to copy instead. */
+export function saveFile(name, mime, content, okMsg) {
+  if (downloadFile(name, mime, content)) { toast(okMsg); return; }
+  openSheet(`<p class="sm" style="margin-bottom:10px">${esc(t('copyInstead'))}</p>
+    <textarea id="fileText" readonly style="width:100%;height:220px;border:1px solid var(--border-strong);border-radius:10px;padding:10px;font:12px/1.5 ui-monospace,Menlo,monospace;direction:ltr;resize:none">${esc(content)}</textarea>
+    <button class="btn btn-primary" style="margin-top:12px" data-act="copyFile">${esc(t('copy'))}</button>`,
+  {
+    copyFile: async () => {
+      const ta = document.getElementById('fileText');
+      try { await navigator.clipboard.writeText(content); toast(t('copied')); }
+      catch { ta.focus(); ta.select(); }
+    },
+  }, { title: name });
 }
 
 export { commit };

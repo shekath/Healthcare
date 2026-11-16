@@ -7,7 +7,7 @@ import {
   isoDate, workingDays, slotsFor, nextAvailable, fmtMonth, dayAbbr, fmtDateLong, fmtTime, feeFor, fmtSar,
   makeRef, bookingIcs, downloadFile, parseIso, fmtDateShort, isBookable, fmtWhen,
 } from '../logic.js';
-import { register, go, reset, replace, esc, toast, appbar, avatar, seg, emptyState } from '../ui.js';
+import { register, go, reset, replace, esc, toast, appbar, avatar, seg, emptyState, saveFile } from '../ui.js';
 
 // ============================================================ 09 SLOT PICKER
 register('slots', {
@@ -178,6 +178,5 @@ register('confirmed', {
 });
 
 export function downloadIcs(b) {
-  const ok = downloadFile(`QRIB-${b.ref}.ics`, 'text/calendar', bookingIcs(b));
-  toast(ok ? t('calendarSaved') : t('genericErr'));
+  saveFile(`QRIB-${b.ref}.ics`, 'text/calendar', bookingIcs(b), t('calendarSaved'));
 }
