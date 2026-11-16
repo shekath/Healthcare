@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QRIB — UI Screens (Saudi DSM / Platforms Code)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   Structured to mirror DGA "Platforms Code" token semantics.
+   Swap the primitive hex values for the official Platforms Code
+   values (Figma community file 1392264328585493958) in one pass —
+   every component below references the semantic layer only.
+   ============================================================ */
+:root{
+  /* --- primitives: brand green --- */
+  --green-900:#00381B; --green-800:#004A24; --green-700:#005A2B;
+  --green-600:#006C35; --green-500:#0B8A48; --green-300:#7FC49E;
+  --green-100:#D6EDE0; --green-50:#EFF8F3;
+
+  /* --- primitives: neutral --- */
+  --n-900:#101A17; --n-800:#1D2B26; --n-700:#3A4A44; --n-600:#5A6A64;
+  --n-500:#78877F; --n-400:#A6B2AC; --n-300:#CBD4CF; --n-200:#E3E9E6;
+  --n-100:#F1F5F3; --n-50:#F8FAF9; --white:#FFFFFF;
+
+  /* --- primitives: semantic accents --- */
+  --info-600:#1B5A8A; --info-50:#E8F1F9;
+  --warn-600:#8A5A00; --warn-50:#FBF2E2;
+  --danger-600:#A32A1E; --danger-50:#FBEDEB;
+  --gold-600:#8A6B1F; --gold-50:#F9F3E2;
+
+  /* --- semantic: surface --- */
+  --surface-page:var(--n-100);
+  --surface-card:var(--white);
+  --surface-sunken:var(--n-50);
+  --surface-brand:var(--green-600);
+  --surface-brand-subtle:var(--green-50);
+
+  /* --- semantic: content (all pairs meet WCAG AA on their surface) --- */
+  --content-primary:var(--n-900);
+  --content-secondary:var(--n-600);
+  --content-tertiary:var(--n-500);
+  --content-on-brand:var(--white);
+  --content-brand:var(--green-700);
+  --content-link:var(--info-600);
+
+  /* --- semantic: border --- */
+  --border-default:var(--n-200);
+  --border-strong:var(--n-300);
+  --border-brand:var(--green-600);
+  --border-focus:var(--green-600);
+
+  /* --- spacing: 4px base grid --- */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px;
+  --sp-5:20px; --sp-6:24px; --sp-8:32px; --sp-10:40px;
+
+  /* --- radius --- */
+  --r-sm:6px; --r-md:10px; --r-lg:14px; --r-pill:999px;
+
+  /* --- type --- */
+  --font:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
+  --fs-display:26px; --fs-h1:21px; --fs-h2:17px; --fs-body:14px;
+  --fs-sm:12.5px; --fs-xs:11px;
+
+  /* --- elevation: restrained, government-grade --- */
+  --elev-1:0 1px 2px rgba(16,26,23,.06);
+  --elev-2:0 4px 14px rgba(16,26,23,.10);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:var(--font);
+  background:#E7ECE9;
+  color:var(--content-primary);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ============================================================
+   GALLERY CHROME (documentation shell, not part of the product)
+   ============================================================ */
+.shell{max-width:1560px;margin:0 auto;padding:var(--sp-8) var(--sp-6) 80px;}
+
+.masthead{
+  background:var(--green-900);
+  color:var(--white);
+  border-radius:var(--r-lg);
+  padding:28px 32px;
+  margin-bottom:var(--sp-8);
+}
+.masthead h1{font-size:var(--fs-display);font-weight:600;letter-spacing:-.3px;}
+.masthead p{
+  font-size:var(--fs-body);color:#BFD9CB;max-width:70ch;
+  margin-top:var(--sp-2);line-height:1.6;
+}
+.mast-row{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--sp-6);flex-wrap:wrap;}
+
+.dir-toggle{display:flex;background:rgba(255,255,255,.12);border-radius:var(--r-pill);padding:3px;}
+.dir-toggle button{
+  font-family:var(--font);font-size:var(--fs-sm);font-weight:500;
+  color:#BFD9CB;background:none;border:0;cursor:pointer;
+  padding:7px 18px;border-radius:var(--r-pill);
+}
+.dir-toggle button[aria-pressed="true"]{background:var(--white);color:var(--green-900);}
+.dir-toggle button:focus-visible{outline:2px solid var(--white);outline-offset:2px;}
+
+/* token strip */
+.tokens{
+  display:flex;flex-wrap:wrap;gap:var(--sp-2);
+  margin-top:var(--sp-6);padding-top:var(--sp-5);
+  border-top:1px solid rgba(255,255,255,.18);
+}
+.swatch{display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-xs);color:#BFD9CB;margin-inline-end:var(--sp-5);}
+.chip{width:18px;height:18px;border-radius:var(--r-sm);border:1px solid rgba(255,255,255,.25);}
+
+.stage-label{
+  font-size:var(--fs-h2);font-weight:600;color:var(--n-800);
+  margin:var(--sp-10) 0 var(--sp-2);
+}
+.stage-label span{font-weight:400;color:var(--n-600);font-size:var(--fs-body);}
+.grid{display:flex;flex-wrap:wrap;gap:28px;}
+
+.screen-wrap{width:var(--w,390px);}
+.caption{
+  font-size:var(--fs-sm);color:var(--n-700);font-weight:500;
+  margin-top:var(--sp-3);display:flex;gap:var(--sp-2);align-items:baseline;
+}
+.caption b{color:var(--n-900);font-weight:600;}
+
+/* ============================================================
+   DEVICE / SCREEN
+   ============================================================ */
+.screen{
+  width:390px;height:844px;
+  background:var(--surface-page);
+  border-radius:26px;
+  border:1px solid var(--n-300);
+  box-shadow:var(--elev-2);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  position:relative;
+}
+.statusbar{
+  height:44px;flex:0 0 44px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 var(--sp-5);
+  font-size:var(--fs-xs);font-weight:600;color:var(--content-primary);
+  background:transparent;
+}
+.statusbar.on-brand{color:var(--white);}
+.sb-icons{display:flex;gap:5px;align-items:center;}
+.sb-icons i{display:block;width:15px;height:9px;border:1.2px solid currentColor;border-radius:2px;opacity:.85;}
+
+.body{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.pad{padding:0 var(--sp-5);}
+
+/* app bar */
+.appbar{
+  display:flex;align-items:center;gap:var(--sp-3);
+  padding:var(--sp-2) var(--sp-5) var(--sp-4);
+}
+.appbar h2{font-size:var(--fs-h1);font-weight:600;letter-spacing:-.2px;}
+.appbar .sub{font-size:var(--fs-sm);color:var(--content-secondary);margin-top:2px;}
+.iconbtn{
+  width:38px;height:38px;flex:0 0 38px;border-radius:var(--r-md);
+  border:1px solid var(--border-default);background:var(--surface-card);
+  display:grid;place-items:center;color:var(--n-700);
+}
+.back-arrow::before{
+  content:"";width:9px;height:9px;border-inline-start:2px solid currentColor;
+  border-block-end:2px solid currentColor;transform:rotate(45deg);
+  margin-inline-start:3px;display:block;
+}
+/* Logical borders mirror the corner in RTL, so the rotation reverses too. */
+html[dir="rtl"] .back-arrow::before{transform:rotate(-45deg);margin-inline-start:0;margin-inline-end:3px;}
+
+/* Latin numerals (phone, reference, fees) keep LTR order inside RTL text */
+.ltr-num{direction:ltr;unicode-bidi:isolate;display:inline-block;}
+
+/* type */
+.h-display{font-size:var(--fs-display);font-weight:600;letter-spacing:-.4px;line-height:1.25;}
+.h1{font-size:var(--fs-h1);font-weight:600;letter-spacing:-.2px;}
+.h2{font-size:var(--fs-h2);font-weight:600;}
+.body-t{font-size:var(--fs-body);line-height:1.6;color:var(--content-secondary);}
+.sm{font-size:var(--fs-sm);color:var(--content-secondary);}
+.xs{font-size:var(--fs-xs);color:var(--content-tertiary);}
+
+/* buttons */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:var(--sp-2);
+  width:100%;min-height:50px;border-radius:var(--r-md);
+  font-family:var(--font);font-size:15px;font-weight:600;
+  border:1px solid transparent;cursor:pointer;
+}
+.btn-primary{background:var(--surface-brand);color:var(--content-on-brand);}
+.btn-secondary{background:var(--surface-card);color:var(--content-brand);border-color:var(--border-brand);}
+.btn-ghost{background:transparent;color:var(--content-secondary);border-color:var(--border-default);}
+.btn-sm{min-height:38px;font-size:13px;border-radius:var(--r-sm);width:auto;padding:0 var(--sp-4);}
+.btn:focus-visible{outline:2px solid var(--border-focus);outline-offset:2px;}
+
+/* cards & lists */
+.card{
+  background:var(--surface-card);border:1px solid var(--border-default);
+  border-radius:var(--r-lg);padding:var(--sp-4);
+}
+.stack{display:flex;flex-direction:column;gap:var(--sp-3);}
+.row{display:flex;align-items:center;gap:var(--sp-3);}
+.between{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);}
+.avatar{
+  width:52px;height:52px;flex:0 0 52px;border-radius:var(--r-md);
+  background:var(--green-100);color:var(--green-800);
+  display:grid;place-items:center;font-weight:600;font-size:15px;
+}
+.avatar.lg{width:72px;height:72px;flex-basis:72px;font-size:20px;border-radius:var(--r-lg);}
+
+/* pills / tags */
+.tag{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:var(--fs-xs);font-weight:500;
+  padding:4px 9px;border-radius:var(--r-pill);
+  background:var(--n-100);color:var(--n-700);
+}
+.tag-brand{background:var(--green-50);color:var(--green-700);}
+.tag-info{background:var(--info-50);color:var(--info-600);}
+.tag-gold{background:var(--gold-50);color:var(--gold-600);}
+.tag-open{background:var(--green-50);color:var(--green-700);}
+.dist{font-size:var(--fs-sm);font-weight:600;color:var(--content-brand);white-space:nowrap;}
+
+/* verified tick */
+.verified{
+  width:15px;height:15px;border-radius:50%;background:var(--green-600);
+  display:inline-grid;place-items:center;flex:0 0 15px;
+}
+.verified::after{
+  content:"";width:6px;height:3px;border-inline-start:1.6px solid #fff;
+  border-block-end:1.6px solid #fff;transform:rotate(-45deg);margin-bottom:2px;
+}
+
+/* inputs */
+.field{display:flex;flex-direction:column;gap:6px;}
+.label{font-size:var(--fs-sm);font-weight:500;color:var(--n-700);}
+.input{
+  min-height:50px;border-radius:var(--r-md);
+  border:1px solid var(--border-strong);background:var(--surface-card);
+  display:flex;align-items:center;gap:var(--sp-2);padding:0 var(--sp-4);
+  font-size:15px;color:var(--content-primary);
+}
+.input.placeholder{color:var(--content-tertiary);}
+.input.focused{border-color:var(--border-brand);box-shadow:0 0 0 3px var(--green-100);}
+.prefix{
+  font-weight:600;color:var(--n-700);padding-inline-end:var(--sp-3);
+  border-inline-end:1px solid var(--border-default);
+}
+.helper{font-size:var(--fs-xs);color:var(--content-tertiary);}
+
+/* segmented control */
+.seg{display:flex;background:var(--n-100);border-radius:var(--r-md);padding:3px;}
+.seg div{
+  flex:1;text-align:center;padding:9px;border-radius:var(--r-sm);
+  font-size:13px;font-weight:500;color:var(--content-secondary);
+}
+.seg div.on{background:var(--white);color:var(--content-primary);font-weight:600;box-shadow:var(--elev-1);}
+
+/* OTP */
+.otp{display:flex;gap:var(--sp-2);}
+.otp span{
+  flex:1;height:58px;border-radius:var(--r-md);
+  border:1px solid var(--border-strong);background:var(--surface-card);
+  display:grid;place-items:center;font-size:22px;font-weight:600;
+}
+.otp span.filled{border-color:var(--border-brand);background:var(--green-50);}
+.otp span.caret{border-color:var(--border-brand);box-shadow:0 0 0 3px var(--green-100);}
+
+/* map */
+.map{position:relative;flex:1;background:#DCE6E0;overflow:hidden;}
+.map::before{
+  content:"";position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.55) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.55) 1px,transparent 1px);
+  background-size:44px 44px;
+}
+.road{position:absolute;background:#F4F7F5;}
+.road.h{height:15px;left:-10%;width:120%;}
+.road.v{width:15px;top:-10%;height:120%;}
+.parcel{position:absolute;background:rgba(255,255,255,.45);border-radius:3px;}
+.pin{
+  position:absolute;width:34px;height:34px;border-radius:50% 50% 50% 4px;
+  transform:rotate(-45deg);display:grid;place-items:center;
+  background:var(--green-600);border:2px solid var(--white);
+  box-shadow:var(--elev-2);
+}
+.pin b{transform:rotate(45deg);color:#fff;font-size:11px;font-weight:600;}
+.pin.alt{background:var(--info-600);}
+.pin.muted{background:var(--n-500);}
+.you{
+  position:absolute;width:20px;height:20px;border-radius:50%;
+  background:var(--info-600);border:3px solid var(--white);box-shadow:var(--elev-2);
+}
+.you::after{
+  content:"";position:absolute;inset:-14px;border-radius:50%;
+  background:rgba(27,90,138,.14);
+}
+.map-search{
+  position:absolute;top:var(--sp-4);inset-inline:var(--sp-4);
+  background:var(--surface-card);border-radius:var(--r-md);
+  border:1px solid var(--border-default);box-shadow:var(--elev-2);
+  min-height:46px;display:flex;align-items:center;gap:var(--sp-3);
+  padding:0 var(--sp-4);font-size:14px;color:var(--content-tertiary);
+}
+.chips{
+  position:absolute;top:76px;inset-inline:0;padding:0 var(--sp-4);
+  display:flex;gap:var(--sp-2);overflow:hidden;
+}
+.chip-f{
+  background:var(--surface-card);border:1px solid var(--border-default);
+  border-radius:var(--r-pill);padding:7px 13px;font-size:var(--fs-xs);
+  font-weight:500;white-space:nowrap;box-shadow:var(--elev-1);
+}
+.chip-f.on{background:var(--green-600);color:#fff;border-color:var(--green-600);}
+
+/* bottom sheet */
+.sheet{
+  background:var(--surface-card);
+  border-radius:var(--r-lg) var(--r-lg) 0 0;
+  border-top:1px solid var(--border-default);
+  box-shadow:0 -6px 20px rgba(16,26,23,.10);
+  padding:var(--sp-3) var(--sp-5) var(--sp-4);
+}
+.grabber{width:36px;height:4px;border-radius:2px;background:var(--n-300);margin:0 auto var(--sp-3);}
+
+/* tab bar */
+.tabbar{
+  flex:0 0 76px;background:var(--surface-card);
+  border-top:1px solid var(--border-default);
+  display:flex;align-items:flex-start;padding-top:10px;
+}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--content-tertiary);}
+.tab b{font-size:10.5px;font-weight:500;}
+.tab.on{color:var(--content-brand);}
+.tab.on b{font-weight:600;}
+.tab svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round;}
+
+/* slot picker */
+.days{display:flex;gap:var(--sp-2);}
+.day{
+  flex:1;border:1px solid var(--border-default);border-radius:var(--r-md);
+  background:var(--surface-card);padding:10px 0;text-align:center;
+}
+.day .d{font-size:var(--fs-xs);color:var(--content-tertiary);}
+.day .n{font-size:16px;font-weight:600;margin-top:2px;}
+.day.on{background:var(--green-600);border-color:var(--green-600);}
+.day.on .d,.day.on .n{color:#fff;}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-2);}
+.slot{
+  border:1px solid var(--border-default);border-radius:var(--r-sm);
+  background:var(--surface-card);padding:11px 0;text-align:center;
+  font-size:13px;font-weight:500;
+}
+.slot.on{background:var(--green-600);border-color:var(--green-600);color:#fff;font-weight:600;}
+.slot.off{background:var(--n-100);color:var(--n-400);text-decoration:line-through;}
+
+/* success */
+.success-mark{
+  width:82px;height:82px;border-radius:50%;background:var(--green-600);
+  display:grid;place-items:center;margin:0 auto;
+}
+.success-mark::after{
+  content:"";width:28px;height:14px;
+  border-inline-start:4px solid #fff;border-block-end:4px solid #fff;
+  transform:rotate(-45deg);margin-bottom:7px;
+}
+
+/* splash */
+.splash{
+  flex:1;background:linear-gradient(165deg,var(--green-900),var(--green-600));
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:0 var(--sp-6) var(--sp-8);color:#fff;
+}
+.wordmark{font-size:44px;font-weight:600;letter-spacing:-1px;}
+.wordmark i{color:#7FE3B4;font-style:normal;}
+
+/* reports */
+.rep{display:flex;gap:var(--sp-3);align-items:flex-start;}
+.rep-ic{
+  width:42px;height:42px;flex:0 0 42px;border-radius:var(--r-md);
+  background:var(--info-50);color:var(--info-600);display:grid;place-items:center;
+  font-size:var(--fs-xs);font-weight:600;
+}
+.divider{height:1px;background:var(--border-default);}
+
+/* scroll fade for over-long lists */
+.fade{
+  position:absolute;bottom:76px;inset-inline:0;height:40px;
+  background:linear-gradient(transparent,var(--surface-page));pointer-events:none;
+}
+.scroll{overflow:hidden;flex:1;min-height:0;align-content:flex-start;}
+
+/* generic star rating */
+.stars{display:inline-flex;gap:2px;color:var(--gold-600);font-size:var(--fs-sm);}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ============ MASTHEAD ============ -->
+<header class="masthead">
+  <div class="mast-row">
+    <div>
+      <h1 data-en="QRIB — Health, wherever you stand" data-ar="قريب — الصحة أينما كنت">QRIB — Health, wherever you stand</h1>
+      <p data-en="Twelve mobile screens covering the full user flow, built to the constraints of the DGA’s national design system (Platforms Code): IBM Plex Sans Arabic, RTL-first with English support, semantic tokens on a 4px grid, and AA contrast throughout."
+         data-ar="اثنتا عشرة شاشة تغطي رحلة المستخدم كاملة، مبنية وفق نظام التصميم الوطني (كود المنصات): خط IBM Plex Sans Arabic، وتصميم يبدأ من اليمين إلى اليسار مع دعم الإنجليزية، ورموز تصميم دلالية على شبكة 4 بكسل.">
+        Twelve mobile screens covering the full user flow, built to the constraints of the DGA’s national design system (Platforms Code): IBM Plex Sans Arabic, RTL-first with English support, semantic tokens on a 4px grid, and AA contrast throughout.
+      </p>
+    </div>
+    <div class="dir-toggle" role="group" aria-label="Interface direction">
+      <button id="btn-en" aria-pressed="true">English</button>
+      <button id="btn-ar" aria-pressed="false">العربية</button>
+    </div>
+  </div>
+
+  <div class="tokens">
+    <div class="swatch"><span class="chip" style="background:#006C35"></span>surface-brand · #006C35</div>
+    <div class="swatch"><span class="chip" style="background:#00381B"></span>green-900 · #00381B</div>
+    <div class="swatch"><span class="chip" style="background:#101A17"></span>content-primary · #101A17</div>
+    <div class="swatch"><span class="chip" style="background:#5A6A64"></span>content-secondary · #5A6A64</div>
+    <div class="swatch"><span class="chip" style="background:#E3E9E6"></span>border-default · #E3E9E6</div>
+    <div class="swatch"><span class="chip" style="background:#F1F5F3"></span>surface-page · #F1F5F3</div>
+    <div class="swatch"><span class="chip" style="background:#1B5A8A"></span>content-link · #1B5A8A</div>
+  </div>
+</header>
+
+<!-- ============================================================
+     STAGE 1 — ENTRY & IDENTITY
+     ============================================================ -->
+<h3 class="stage-label" data-en="Entry and identity" data-ar="الدخول والهوية">Entry and identity
+  <span data-en="— app open, OTP or SSO, location consent" data-ar="— فتح التطبيق، رمز التحقق أو الدخول الموحّد، إذن الموقع">— app open, OTP or SSO, location consent</span>
+</h3>
+<div class="grid">
+
+  <!-- 01 SPLASH -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="statusbar on-brand"><span>9:41</span><span class="sb-icons"><i></i></span></div>
+      <div class="body">
+        <div class="splash">
+          <div style="margin-top:150px">
+            <div class="wordmark">QR<i>Ī</i>B</div>
+            <p style="font-size:17px;color:#CDEBDC;margin-top:var(--sp-3);line-height:1.55;max-width:26ch"
+               data-en="Find the nearest hospital, choose the right doctor, book in one tap."
+               data-ar="اعثر على أقرب مستشفى، واختر الطبيب المناسب، واحجز بلمسة واحدة.">
+              Find the nearest hospital, choose the right doctor, book in one tap.
+            </p>
+          </div>
+          <div class="stack">
+            <button class="btn" style="background:#fff;color:var(--green-800)" data-en="Get started" data-ar="ابدأ الآن">Get started</button>
+            <button class="btn" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.45)"
+              data-en="I already have an account" data-ar="لدي حساب بالفعل">I already have an account</button>
+            <p style="text-align:center;font-size:var(--fs-xs);color:#A9D6C0;margin-top:var(--sp-2)"
+               data-en="Licensed providers only · Data held in the Kingdom"
+               data-ar="مزودو خدمة مرخصون فقط · البيانات محفوظة داخل المملكة">
+              Licensed providers only · Data held in the Kingdom</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><b>01</b><span data-en="Splash — first launch" data-ar="شاشة البداية — أول تشغيل">Splash — first launch</span></div>
+  </div>
+
+  <!-- 02 LOGIN -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="sb-icons"><i></i></span></div>
+      <div class="body">
+        <div class="appbar"><div class="iconbtn back-arrow"></div></div>
+        <div class="pad stack" style="gap:var(--sp-5)">
+          <div>
+            <h2 class="h-display" data-en="Sign in" data-ar="تسجيل الدخول">Sign in</h2>
+            <p class="body-t" style="margin-top:6px" data-en="We’ll send a 4-digit code to confirm it’s you."
+               data-ar="سنرسل رمزًا من ٤ أرقام للتأكد من هويتك.">We’ll send a 4-digit code to confirm it’s you.</p>
+          </div>
+
+          <div class="seg">
+            <div class="on" data-en="Phone" data-ar="رقم الجوال">Phone</div>
+            <div data-en="Email" data-ar="البريد الإلكتروني">Email</div>
+          </div>
+
+          <div class="field">
+            <label class="label" data-en="Mobile number" data-ar="رقم الجوال">Mobile number</label>
+            <div class="input focused"><span class="prefix ltr-num">+966</span><span class="ltr-num">5X XXX XXXX</span></div>
+            <span class="helper" data-en="Saudi and international numbers accepted."
+                  data-ar="نقبل الأرقام السعودية والدولية.">Saudi and international numbers accepted.</span>
+          </div>
+
+          <button class="btn btn-primary" data-en="Send code" data-ar="إرسال الرمز">Send code</button>
+
+          <div class="row" style="gap:var(--sp-3)">
+            <span class="divider" style="flex:1"></span>
+            <span class="xs" data-en="or continue with" data-ar="أو تابع باستخدام">or continue with</span>
+            <span class="divider" style="flex:1"></span>
+          </div>
+
+          <div class="row" style="gap:var(--sp-3)">
+            <button class="btn btn-ghost" style="flex:1" data-en="Nafath" data-ar="نفاذ">Nafath</button>
+            <button class="btn btn-ghost" style="flex:1">Apple</button>
+            <button class="btn btn-ghost" style="flex:1">Google</button>
+          </div>
+
+          <p class="xs" style="line-height:1.6;text-align:center"
+             data-en="By continuing you agree to our Terms and Privacy Notice, written to comply with the Personal Data Protection Law."
+             data-ar="بمتابعتك فإنك توافق على الشروط وإشعار الخصوصية، الموضوعين وفق نظام حماية البيانات الشخصية.">
+            By continuing you agree to our Terms and Privacy Notice, written to comply with the Personal Data Protection Law.</p>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><b>02</b><span data-en="Sign in — phone, email or SSO" data-ar="تسجيل الدخول — جوال أو بريد أو دخول موحّد">Sign in — phone, email or SSO</span></div>
+  </div>
+
+  <!-- 03 OTP -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="sb-icons"><i></i></span></div>
+      <div class="body">
+        <div class="appbar"><div class="iconbtn back-arrow"></div></div>
+        <div class="pad stack" style="gap:var(--sp-5)">
+          <div>
+            <h2 class="h-display" data-en="Enter your code" data-ar="أدخل رمز التحقق">Enter your code</h2>
+            <p class="body-t" style="margin-top:6px">
+              <span data-en="Sent to" data-ar="أُرسل إلى">Sent to</span>
+              <b class="ltr-num" style="color:var(--content-primary);font-weight:600">+966 55 214 8830</b>
+            </p>
+          </div>
+
+          <div class="otp">
+            <span class="filled">4</span><span class="filled">7</span><span class="caret">|</span><span></span>
+          </div>
+
+          <div class="card" style="background:var(--info-50);border-color:#CBDFEE;padding:var(--sp-3) var(--sp-4)">
+            <p class="sm" style="color:var(--info-600)"
+               data-en="Code expires in 04:52. Never share it — QRIB will not ask you for it by phone."
+               data-ar="ينتهي الرمز خلال ٠٤:٥٢. لا تشاركه مطلقًا — لن يطلبه منك تطبيق قريب هاتفيًا.">
+              Code expires in 04:52. Never share it — QRIB will not ask you for it by phone.</p>
+          </div>
+
+          <button class="btn btn-primary" data-en="Verify and continue" data-ar="تحقق وتابع">Verify and continue</button>
+
+          <div style="text-align:center">
+            <span class="sm" data-en="Didn’t get it?" data-ar="لم يصلك الرمز؟">Didn’t get it?</span>
+            <span class="sm" style="color:var(--content-link);font-weight:600">
+              <span data-en="Resend in 0:28" data-ar="إعادة الإرسال خلال ٠:٢٨">Resend in 0:28</span></span>
+          </div>
+
+          <div class="divider" style="margin-top:var(--sp-2)"></div>
+          <button class="btn btn-ghost" data-en="Change number" data-ar="تغيير الرقم">Change number</button>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><b>03</b><span data-en="OTP verification" data-ar="التحقق من الرمز">OTP verification</span></div>
+  </div>
+
+  <!-- 04 LOCATION -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="sb-icons"><i></i></span></div>
+      <div class="body" style="justify-content:space-between">
+        <div>
+          <div class="appbar" style="padding-top:var(--sp-6)"></div>
+          <div class="pad">
+            <div style="height:190px;border-radius:var(--r-lg);background:var(--green-50);
+                        border:1px solid var(--green-100);position:relative;overflow:hidden">
+              <div class="road h" style="top:70px;background:#fff"></div>
+              <div class="road v" style="left:120px;background:#fff"></div>
+              <div class="you" style="top:82px;left:112px"></div>
+              <div class="pin" style="top:34px;left:200px"><b>+</b></div>
+              <div class="pin alt" style="top:110px;left:60px"><b>+</b></div>
+            </div>
+
+            <h2 class="h-display" style="margin-top:var(--sp-6)"
+                data-en="Use your location to rank care by distance"
+                data-ar="استخدم موقعك لترتيب مقدمي الرعاية حسب المسافة">
+              Use your location to rank care by distance</h2>
+            <p class="body-t" style="margin-top:var(--sp-3)"
+               data-en="QRIB sorts hospitals, clinics and doctors by how far they are from where you are standing right now, and gives you directions to the door."
+               data-ar="يرتب قريب المستشفيات والعيادات والأطباء حسب بُعدهم عن موقعك الحالي، ويرشدك إلى الباب مباشرة.">
+              QRIB sorts hospitals, clinics and doctors by how far they are from where you are standing right now, and gives you directions to the door.</p>
+
+            <div class="card" style="margin-top:var(--sp-5);padding:var(--sp-3) var(--sp-4)">
+              <p class="sm" data-en="Your location is used only while the app is open. You can turn it off at any time in Settings."
+                 data-ar="يُستخدم موقعك أثناء فتح التطبيق فقط، ويمكنك إيقافه في أي وقت من الإعدادات.">
+                Your location is used only while the app is open. You can turn it off at any time in Settings.</p>
+            </div>
+          </div>
+        </div>
+        <div class="pad stack" style="padding-bottom:var(--sp-8)">
+          <button class="btn btn-primary" data-en="Allow while using the app" data-ar="السماح أثناء استخدام التطبيق">Allow while using the app</button>
+          <button class="btn btn-ghost" data-en="Enter a city instead" data-ar="إدخال المدينة يدويًا">Enter a city instead</button>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><b>04</b><span data-en="Location permission" data-ar="إذن الموقع">Location permission</span></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     STAGE 2 — DISCOVER
+     ============================================================ -->
+<h3 class="stage-label" data-en="Discover" data-ar="الاستكشاف">Discover
+  <span data-en="— map home, filtering, ranked results" data-ar="— الخريطة الرئيسية، التصفية، النتائج المرتبة">— map home, filtering, ranked results</span>
+</h3>
+<div class="grid">
+
+  <!-- 05 HOME MAP -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="sb-icons"><i></i></span></div>
+      <div class="body">
+        <div class="map">
+          <div class="road h" style="top:150px"></div>
+          <div class="road v" style="left:96px"></div>
+          <div class="road v" style="left:270px"></div>
+          <div class="parcel" style="top:40px;left:20px;width:60px;height:90px"></div>
+          <div class="parcel" style="top:40px;left:130px;width:120px;height:90px"></div>
+          <div class="parcel" style="top:190px;left:20px;width:60px;height:110px"></div>
+          <div class="parcel" style="top:190px;left:130px;width:120px;height:110px"></div>
+
+          <div class="you" style="top:196px;left:150px"></div>
+          <div class="pin" style="top:96px;left:186px"><b>+</b></div>
+          <div class="pin alt" style="top:224px;left:262px"><b>+</b></div>
+          <div class="pin muted" style="top:150px;left:40px"><b>+</b></div>
+
+          <div class="map-search">
+            <span data-en="Search hospitals, clinics or doctors" data-ar="ابحث عن مستشفى أو عيادة أو طبيب">Search hospitals, clinics or doctors</span>
+          </div>
+          <div class="chips">
+            <span class="chip-f on" data-en="Open now" data-ar="مفتوح الآن">Open now</span>
+            <span class="chip-f" data-en="Emergency" data-ar="طوارئ">Emergency</span>
+            <span class="chip-f" data-en="Dentist" data-ar="أسنان">Dentist</span>
+            <span class="chip-f" data-en="Paediatrics" data-ar="أطفال">Paediatrics</span>
+          </div>
+        </div>
+
+        <div class="sheet">
+          <div class="grabber"></div>
+          <div class="between" style="margin-bottom:var(--sp-3)">
+            <div>
+              <div class="h2" data-en="Nearby care" data-ar="رعاية قريبة منك">Nearby care</div>
+              <div class="xs" data-en="14 open near Al Olaya, Riyadh" data-ar="١٤ مفتوحة قرب العليا، الرياض">14 open near Al Olaya, Riyadh</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" data-en="List" data-ar="قائمة">List</button>
+          </div>
+
+          <div class="stack">
+            <div class="card" style="padding:var(--sp-3)">
+              <div class="row">
+                <div class="avatar">KF</div>
+                <div style="flex:1;min-width:0">
+                  <div class="between">
+                    <div class="h2" style="font-size:15px" data-en="King Fahad Medical City" data-ar="مدينة الملك فهد الطبية">King Fahad Medical City</div>
+                    <span class="dist">0.8 km</span>
+                  </div>
+                  <div class="xs" style="margin-top:2px" data-en="Multi-specialty hospital · 24 hours" data-ar="مستشفى متعدد التخصصات · ٢٤ ساعة">Multi-specialty hospital · 24 hours</div>
+                  <div class="row" style="gap:5px;margin-top:7px">
+                    <span class="tag tag-open" data-en="Open" data-ar="مفتوح">Open</span>
+                    <span class="tag" data-en="42 doctors" data-ar="٤٢ طبيبًا">42 doctors</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="padding:var(--sp-3)">
+              <div class="row">
+                <div class="avatar" style="background:var(--info-50);color:var(--info-600)">DS</div>
+                <div style="flex:1;min-width:0">
+                  <div class="between">
+                    <div class="h2" style="font-size:15px" data-en="Dr. Sulaiman Al Habib" data-ar="د. سليمان الحبيب">Dr. Sulaiman Al Habib</div>
+                    <span class="dist">1.4 km</span>
+                  </div>
+                  <div class="xs" style="margin-top:2px" data-en="Private hospital · Closes 23:00" data-ar="مستشفى خاص · يغلق ٢٣:٠٠">Private hospital · Closes 23:00</div>
+                  <div class="row" style="gap:5px;margin-top:7px">
+                    <span class="tag tag-open" data-en="Open" data-ar="مفتوح">Open</span>
+                    <span class="tag" data-en="61 doctors" data-ar="٦١ طبيبًا">61 doctors</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabbar">
+          <div class="tab on">
+            <svg viewBox="0 0 24 24"><path d="M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3z"/><path d="M9 4v13M15 7v13"/></svg>
+            <b data-en="Map" data-ar="الخريطة">Map</b></div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <b data-en="Search" data-ar="بحث">Search</b></div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-9a4 4 0 017-2.6A4 4 0 0119 11c0 4.5-7 9-7 9z"/></svg>
+            <b data-en="Saved" data-ar="المحفوظة">Saved</b></div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg>
+            <b data-en="Reports" data-ar="التقارير">Reports</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><b>05</b><span data-en="Home — map, ranked by distance" data-ar="الرئيسية — خريطة مرتبة حسب المسافة">Home — map, ranked by distance</span></div>
+  </div>
+
+  <!-- 06 SEARCH & FILTER -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="sb-icons"><i></i></span></div>
+      <div class="body">
+        <div class="appbar">
+          <div class="iconbtn back-arrow"></div>
+          <div style="flex:1">
+            <h2 data-en="Refine" data-ar="تصفية">Refine</h2>
+            <div class="sub" data-en="Cardiology near you" data-ar="أمراض القلب بالقرب منك">Cardiology near you</div>
+          </div>
+        </div>
+
+        <div class="pad stack" style="gap:var(--sp-5)">
+          <div class="input placeholder"><span data-en="Cardiology" data-ar="أمراض القلب">Cardiology</span></div>
+
+          <div class="field">
+            <span class="label" data-en="Distance from you" data-ar="المسافة عنك">Distance from you</span>
+            <div class="row" style="gap:var(--sp-2)">
+              <span class="chip-f on">2 km</span><span class="chip-f">5 km</span>
+              <span class="chip-f">10 km</span><span class="chip-f" data-en="Any" data-ar="الكل">Any</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="label" data-en="Availability" data-ar="التوفر">Availability</span>
+            <div class="row" style="gap:var(--sp-2);flex-wrap:wrap">
+              <span class="chip-f on" data-en="Today" data-ar="اليوم">Today</span>
+              <span class="chip-f" data-en="Tomorrow" data-ar="غدًا">Tomorrow</span>
+              <span class="chip-f" data-en="This week" data-ar="هذا الأسبوع">This week</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="label" data-en="Doctor speaks" data-ar="لغة الطبيب">Doctor speaks</span>
+            <div class="row" style="gap:var(--sp-2);flex-wrap:wrap">
+              <span class="chip-f on" data-en="Arabic" data-ar="العربية">Arabic</span>
+              <span class="chip-f on" data-en="English" data-ar="الإنجليزية">English</span>
+              <span class="chip-f" data-en="Urdu" data-ar="الأردية">Urdu</span>
+              <span class="chip-f" data-en="Tagalog" data-ar="التاغالوغية">Tagalog</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="label" data-en="Doctor gender" data-ar="جنس الطبيب">Doctor gender</span>
+            <div class="seg">
+              <div class="on" data-en="Any" data-ar="الكل">Any</div>
+              <div data-en="Female" data-ar="أنثى">Female</div>
+              <div data-en="Male" data-ar="ذكر">Male</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="label" data-en="Visit type" data-ar="نوع الزيارة">Visit type</span>
+            <div class="seg">
+              <div class="on" data-en="In person" data-ar="حضوري">In person</div>
+              <div data-en="Video" data-ar="مرئي">Video</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:auto;padding:var(--sp-4) var(--sp-5) var(--sp-6);
+                    border-top:1px solid var(--border-default);background:var(--surface-card)">
+          <div class="row" style="gap:var(--sp-3)">
+            <button class="btn btn-ghost" style="flex:0 0 110px" data-en="Reset" data-ar="إعادة">Reset</button>
+            <button class="btn btn-primary" style="flex:1" data-en="Show 18 doctors" data-ar="عرض ١٨ طبيبًا">Show 18 doctors</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><b>06</b><span data-en="Search and filter" data-ar="البحث والتصفية">Search and filter</span></div>
+  </div>
+
+  <!-- 07 DOCTOR LIST -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="sb-icons"><i></i></span></div>
+      <div class="body">
+        <div class="appbar">
+          <div class="iconbtn back-arrow"></div>
+          <div style="flex:1">
+            <h2 data-en="Cardiology" data-ar="أمراض القلب">Cardiology</h2>
+            <div class="sub" data-en="18 doctors · nearest first" data-ar="١٨ طبيبًا · الأقرب أولًا">18 doctors · nearest first</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" data-en="Filter" data-ar="تصفية">Filter</button>
+        </div>
+
+        <div class="pad stack scroll" style="gap:var(--sp-3)">
+          <div class="card">
+            <div class="row" style="align-items:flex-start">
+              <div class="avatar">HA</div>
+              <div style="flex:1;min-width:0">
+                <div class="between">
+                  <div class="row" style="gap:5px">
+                    <span class="h2" style="font-size:15px" data-en="Dr. Hana Al Qahtani" data-ar="د. هناء القحطاني">Dr. Hana Al Qahtani</span>
+                    <span class="verified" title="MOH licensed"></span>
+                  </div>
+                  <span class="dist">1.2 km</span>
+                </div>
+                <div class="xs" style="margin-top:2px" data-en="Consultant Cardiologist · 14 yrs" data-ar="استشارية أمراض قلب · ١٤ سنة">Consultant Cardiologist · 14 yrs</div>
+                <div class="xs" data-en="King Fahad Medical City" data-ar="مدينة الملك فهد الطبية">King Fahad Medical City</div>
+                <div class="row" style="gap:5px;margin-top:8px;flex-wrap:wrap">
+                  <span class="tag tag-brand" data-en="Today 14:30" data-ar="اليوم ١٤:٣٠">Today 14:30</span>
+                  <span class="tag" data-en="AR · EN" data-ar="عربي · إنجليزي">AR · EN</span>
+                  <span class="tag tag-gold">★ 4.8</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="row" style="align-items:flex-start">
+              <div class="avatar" style="background:var(--info-50);color:var(--info-600)">MR</div>
+              <div style="flex:1;min-width:0">
+                <div class="between">
+                  <div class="row" style="gap:5px">
+                    <span class="h2" style="font-size:15px" data-en="Dr. Majid Al Rashed" data-ar="د. ماجد الراشد">Dr. Majid Al Rashed</span>
+                    <span class="verified"></span>
+                  </div>
+                  <span class="dist">1.9 km</span>
+                </div>
+                <div class="xs" style="margin-top:2px" data-en="Interventional Cardiology · 9 yrs" data-ar="قسطرة قلبية · ٩ سنوات">Interventional Cardiology · 9 yrs</div>
+                <div class="xs" data-en="Dr. Sulaiman Al Habib" data-ar="د. سليمان الحبيب">Dr. Sulaiman Al Habib</div>
+                <div class="row" style="gap:5px;margin-top:8px;flex-wrap:wrap">
+                  <span class="tag tag-brand" data-en="Tomorrow 09:00" data-ar="غدًا ٠٩:٠٠">Tomorrow 09:00</span>
+                  <span class="tag" data-en="AR · EN · UR" data-ar="عربي · إنجليزي · أردو">AR · EN · UR</span>
+                  <span class="tag tag-gold">★ 4.6</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="row" style="align-items:flex-start">
+              <div class="avatar" style="background:var(--gold-50);color:var(--gold-600)">SN</div>
+              <div style="flex:1;min-width:0">
+                <div class="between">
+                  <div class="row" style="gap:5px">
+                    <span class="h2" style="font-size:15px" data-en="Dr. Sara Nasser" data-ar="د. سارة ناصر">Dr. Sara Nasser</span>
+                    <span class="verified"></span>
+                  </div>
+                  <span class="dist">3.4 km</span>
+                </div>
+                <div class="xs" style="margin-top:2px" data-en="Cardiologist · 7 yrs" data-ar="أخصائية قلب · ٧ سنوات">Cardiologist · 7 yrs</div>
+                <div class="xs" data-en="Al Mouwasat Hospital" data-ar="مستشفى المواساة">Al Mouwasat Hospital</div>
+                <div class="row" style="gap:5px;margin-top:8px;flex-wrap:wrap">
+                  <span class="tag tag-info" data-en="Video visit" data-ar="زيارة مرئية">Video visit</span>
+                  <span class="tag" data-en="AR · EN" data-ar="عربي · إنجليزي">AR · EN</span>
+                  <span class="tag tag-gold">★ 4.9</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="opacity:.55">
+            <div class="row" style="align-items:flex-start">
+              <div class="avatar">AK</div>
+              <div style="flex:1">
+                <div class="between">
+                  <span class="h2" style="font-size:15px" data-en="Dr. Ahmed Kamal" data-ar="د. أحمد كمال">Dr. Ahmed Kamal</span>
+                  <span class="dist">4.1 km</span>
+                </div>
+                <div class="xs" style="margin-top:2px" data-en="Cardiologist · 11 yrs" data-ar="أخصائي قلب · ١١ سنة">Cardiologist · 11 yrs</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="fade"></div>
+
+        <div class="tabbar">
+          <div class="tab"><svg viewBox="0 0 24 24"><path d="M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3z"/></svg><b data-en="Map" data-ar="الخريطة">Map</b></div>
+          <div class="tab on"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><b data-en="Search" data-ar="بحث">Search</b></div>
+          <div class="tab"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-9a4 4 0 017-2.6A4 4 0 0119 11c0 4.5-7 9-7 9z"/></svg><b data-en="Saved" data-ar="المحفوظة">Saved</b></div>
+          <div class="tab"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg><b data-en="Reports" data-ar="التقارير">Reports</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><b>07</b><span data-en="Doctor list — ranked by distance" data-ar="قائمة الأطباء — مرتبة حسب المسافة">Doctor list — ranked by distance</span></div>
+  </div>
+
+  <!-- 08 DOCTOR PROFILE -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="sb-icons"><i></i></span></div>
+      <div class="body">
+        <div class="appbar">
+          <div class="iconbtn back-arrow"></div>
+          <div style="flex:1"></div>
+          <div class="iconbtn" title="Save">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.5-7-9a4 4 0 017-2.6A4 4 0 0119 11c0 4.5-7 9-7 9z"/></svg>
+          </div>
+        </div>
+
+        <div class="pad stack scroll" style="gap:var(--sp-4)">
+          <div class="row" style="align-items:flex-start">
+            <div class="avatar lg">HA</div>
+            <div style="flex:1">
+              <div class="row" style="gap:6px">
+                <span class="h1" data-en="Dr. Hana Al Qahtani" data-ar="د. هناء القحطاني">Dr. Hana Al Qahtani</span>
+                <span class="verified"></span>
+              </div>
+              <div class="sm" style="margin-top:3px" data-en="Consultant Cardiologist" data-ar="استشارية أمراض القلب">Consultant Cardiologist</div>
+              <div class="row" style="gap:5px;margin-top:8px">
+                <span class="tag tag-gold">★ 4.8 · 212</span>
+                <span class="tag" data-en="14 years" data-ar="١٤ سنة">14 years</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:var(--sp-3) var(--sp-4)">
+            <div class="between">
+              <div>
+                <div class="h2" style="font-size:14px" data-en="King Fahad Medical City" data-ar="مدينة الملك فهد الطبية">King Fahad Medical City</div>
+                <div class="xs" style="margin-top:2px" data-en="Al Olaya, Riyadh" data-ar="العليا، الرياض">Al Olaya, Riyadh</div>
+              </div>
+              <div style="text-align:end">
+                <div class="dist">1.2 km</div>
+                <div class="xs" data-en="6 min drive" data-ar="٦ دقائق بالسيارة">6 min drive</div>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-sm" style="width:100%;margin-top:var(--sp-3)"
+                    data-en="Get directions" data-ar="الاتجاهات">Get directions</button>
+          </div>
+
+          <div>
+            <div class="h2" style="margin-bottom:6px" data-en="Credentials" data-ar="المؤهلات">Credentials</div>
+            <p class="sm" style="line-height:1.65"
+               data-en="MBBS, King Saud University. Saudi Board of Internal Medicine. Fellowship in Adult Cardiology, Canada. SCFHS licence 24-118902, verified March 2026."
+               data-ar="بكالوريوس طب وجراحة، جامعة الملك سعود. البورد السعودي للطب الباطني. زمالة أمراض القلب للبالغين، كندا. ترخيص الهيئة ٢٤-١١٨٩٠٢، تم التحقق في مارس ٢٠٢٦.">
+              MBBS, King Saud University. Saudi Board of Internal Medicine. Fellowship in Adult Cardiology, Canada. SCFHS licence 24-118902, verified March 2026.</p>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="between">
+            <span class="sm" data-en="Speaks" data-ar="اللغات">Speaks</span>
+            <span class="sm" style="color:var(--content-primary);font-weight:500"
+                  data-en="Arabic, English" data-ar="العربية، الإنجليزية">Arabic, English</span>
+          </div>
+          <div class="between">
+            <span class="sm" data-en="Consultation fee" data-ar="رسوم الاستشارة">Consultation fee</span>
+            <span class="sm" style="color:var(--content-primary);font-weight:500">SAR 400–550</span>
+          </div>
+          <div class="between">
+            <span class="sm" data-en="Insurance" data-ar="التأمين">Insurance</span>
+            <span class="sm" style="color:var(--content-primary);font-weight:500"
+                  data-en="Bupa, Tawuniya, MedGulf" data-ar="بوبا، التعاونية، ميدغلف">Bupa, Tawuniya, MedGulf</span>
+          </div>
+        </div>
+
+        <div style="padding:var(--sp-4) var(--sp-5) var(--sp-6);border-top:1px solid var(--border-default);
+                    background:var(--surface-card)">
+          <div class="between" style="margin-bottom:var(--sp-3)">
+            <span class="xs" data-en="Next available" data-ar="أقرب موعد">Next available</span>
+            <span class="sm" style="font-weight:600;color:var(--content-brand)" data-en="Today, 14:30" data-ar="اليوم، ١٤:٣٠">Today, 14:30</span>
+          </div>
+          <button class="btn btn-primary" data-en="Book appointment" data-ar="حجز موعد">Book appointment</button>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><b>08</b><span data-en="Doctor profile" data-ar="ملف الطبيب">Doctor profile</span></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     STAGE 3 — BOOK & KEEP
+     ============================================================ -->
+<h3 class="stage-label" data-en="Book and keep" data-ar="الحجز والمتابعة">Book and keep
+  <span data-en="— slot selection, confirmation, favourites, reports" data-ar="— اختيار الموعد، التأكيد، المفضلة، التقارير">— slot selection, confirmation, favourites, reports</span>
+</h3>
+<div class="grid">
+
+  <!-- 09 SLOT PICKER -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="sb-icons"><i></i></span></div>
+      <div class="body">
+        <div class="appbar">
+          <div class="iconbtn back-arrow"></div>
+          <div style="flex:1">
+            <h2 data-en="Choose a time" data-ar="اختر الموعد">Choose a time</h2>
+            <div class="sub" data-en="Dr. Hana Al Qahtani" data-ar="د. هناء القحطاني">Dr. Hana Al Qahtani</div>
+          </div>
+        </div>
+
+        <div class="pad stack" style="gap:var(--sp-5)">
+          <div class="seg">
+            <div class="on" data-en="In person" data-ar="حضوري">In person</div>
+            <div data-en="Video visit" data-ar="زيارة مرئية">Video visit</div>
+          </div>
+
+          <div>
+            <div class="between" style="margin-bottom:var(--sp-3)">
+              <span class="h2" data-en="March 2026" data-ar="مارس ٢٠٢٦">March 2026</span>
+              <span class="sm" style="color:var(--content-link);font-weight:500" data-en="Next week" data-ar="الأسبوع القادم">Next week</span>
+            </div>
+            <div class="days">
+              <div class="day on"><div class="d" data-en="Mon" data-ar="ن">Mon</div><div class="n">16</div></div>
+              <div class="day"><div class="d" data-en="Tue" data-ar="ث">Tue</div><div class="n">17</div></div>
+              <div class="day"><div class="d" data-en="Wed" data-ar="ر">Wed</div><div class="n">18</div></div>
+              <div class="day"><div class="d" data-en="Thu" data-ar="خ">Thu</div><div class="n">19</div></div>
+              <div class="day"><div class="d" data-en="Sun" data-ar="ح">Sun</div><div class="n">22</div></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="h2" style="margin-bottom:var(--sp-3)" data-en="Morning" data-ar="صباحًا">Morning</div>
+            <div class="slots">
+              <div class="slot off">09:00</div>
+              <div class="slot">09:40</div>
+              <div class="slot">10:20</div>
+              <div class="slot off">11:00</div>
+              <div class="slot">11:40</div>
+              <div class="slot">12:20</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="h2" style="margin-bottom:var(--sp-3)" data-en="Afternoon" data-ar="مساءً">Afternoon</div>
+            <div class="slots">
+              <div class="slot">13:50</div>
+              <div class="slot on">14:30</div>
+              <div class="slot">15:10</div>
+              <div class="slot off">16:30</div>
+              <div class="slot">17:10</div>
+              <div class="slot">17:50</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:auto;padding:var(--sp-4) var(--sp-5) var(--sp-6);
+                    border-top:1px solid var(--border-default);background:var(--surface-card)">
+          <div class="between" style="margin-bottom:var(--sp-3)">
+            <span class="sm" data-en="Monday 16 March, 14:30" data-ar="الإثنين ١٦ مارس، ١٤:٣٠">Monday 16 March, 14:30</span>
+            <span class="sm" style="font-weight:600">SAR 450</span>
+          </div>
+          <button class="btn btn-primary" data-en="Confirm booking" data-ar="تأكيد الحجز">Confirm booking</button>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><b>09</b><span data-en="Slot selection" data-ar="اختيار الموعد">Slot selection</span></div>
+  </div>
+
+  <!-- 10 CONFIRMED -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="sb-icons"><i></i></span></div>
+      <div class="body" style="justify-content:space-between">
+        <div class="pad" style="padding-top:64px">
+          <div class="success-mark"></div>
+          <h2 class="h-display" style="text-align:center;margin-top:var(--sp-6)"
+              data-en="Booked" data-ar="تم الحجز">Booked</h2>
+          <p class="body-t" style="text-align:center;margin-top:6px"
+             data-en="A reminder is set for one hour before."
+             data-ar="تم ضبط تذكير قبل الموعد بساعة.">A reminder is set for one hour before.</p>
+
+          <div class="card" style="margin-top:var(--sp-6)">
+            <div class="row" style="align-items:flex-start">
+              <div class="avatar">HA</div>
+              <div style="flex:1">
+                <div class="h2" style="font-size:15px" data-en="Dr. Hana Al Qahtani" data-ar="د. هناء القحطاني">Dr. Hana Al Qahtani</div>
+                <div class="xs" style="margin-top:2px" data-en="Consultant Cardiologist" data-ar="استشارية أمراض القلب">Consultant Cardiologist</div>
+              </div>
+            </div>
+            <div class="divider" style="margin:var(--sp-4) 0"></div>
+            <div class="between" style="margin-bottom:var(--sp-3)">
+              <span class="sm" data-en="When" data-ar="الموعد">When</span>
+              <span class="sm" style="color:var(--content-primary);font-weight:600"
+                    data-en="Mon 16 March, 14:30" data-ar="الإثنين ١٦ مارس، ١٤:٣٠">Mon 16 March, 14:30</span>
+            </div>
+            <div class="between" style="margin-bottom:var(--sp-3)">
+              <span class="sm" data-en="Where" data-ar="المكان">Where</span>
+              <span class="sm" style="color:var(--content-primary);font-weight:600;text-align:end"
+                    data-en="King Fahad Medical City" data-ar="مدينة الملك فهد الطبية">King Fahad Medical City</span>
+            </div>
+            <div class="between">
+              <span class="sm" data-en="Reference" data-ar="الرقم المرجعي">Reference</span>
+              <span class="sm" style="color:var(--content-primary);font-weight:600">QRB-40218</span>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:var(--sp-3);background:var(--green-50);border-color:var(--green-100);
+                                   padding:var(--sp-3) var(--sp-4)">
+            <p class="sm" style="color:var(--green-800)"
+               data-en="Dr. Hana has been added to your Consulted list. Rebook her in one tap next time."
+               data-ar="تمت إضافة د. هناء إلى قائمة من راجعتهم. احجز معها بلمسة واحدة في المرة القادمة.">
+              Dr. Hana has been added to your Consulted list. Rebook her in one tap next time.</p>
+          </div>
+        </div>
+
+        <div class="pad stack" style="padding-bottom:var(--sp-8)">
+          <button class="btn btn-primary" data-en="Get directions" data-ar="الاتجاهات">Get directions</button>
+          <button class="btn btn-ghost" data-en="Add to calendar" data-ar="إضافة إلى التقويم">Add to calendar</button>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><b>10</b><span data-en="Booking confirmed" data-ar="تأكيد الحجز">Booking confirmed</span></div>
+  </div>
+
+  <!-- 11 FAVOURITES -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="sb-icons"><i></i></span></div>
+      <div class="body">
+        <div class="appbar" style="padding-top:var(--sp-4)">
+          <div style="flex:1"><h2 data-en="Saved" data-ar="المحفوظة">Saved</h2></div>
+        </div>
+
+        <div class="pad" style="margin-bottom:var(--sp-4)">
+          <div class="seg">
+            <div class="on" data-en="Consulted" data-ar="من راجعتهم">Consulted</div>
+            <div data-en="Favourites" data-ar="المفضلة">Favourites</div>
+          </div>
+        </div>
+
+        <div class="pad stack scroll" style="gap:var(--sp-3)">
+          <p class="xs" data-en="Doctors you have seen before, across every hospital and clinic."
+             data-ar="الأطباء الذين راجعتهم سابقًا، في كل المستشفيات والعيادات.">
+            Doctors you have seen before, across every hospital and clinic.</p>
+
+          <div class="card">
+            <div class="row" style="align-items:flex-start">
+              <div class="avatar">HA</div>
+              <div style="flex:1;min-width:0">
+                <div class="between">
+                  <div class="row" style="gap:5px">
+                    <span class="h2" style="font-size:15px" data-en="Dr. Hana Al Qahtani" data-ar="د. هناء القحطاني">Dr. Hana Al Qahtani</span>
+                    <span class="verified"></span>
+                  </div>
+                  <span class="dist">1.2 km</span>
+                </div>
+                <div class="xs" style="margin-top:2px" data-en="Cardiology · last seen 16 Mar 2026" data-ar="قلب · آخر زيارة ١٦ مارس ٢٠٢٦">Cardiology · last seen 16 Mar 2026</div>
+                <button class="btn btn-secondary btn-sm" style="margin-top:var(--sp-3)"
+                        data-en="Book again" data-ar="احجز مجددًا">Book again</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="row" style="align-items:flex-start">
+              <div class="avatar" style="background:var(--info-50);color:var(--info-600)">YB</div>
+              <div style="flex:1;min-width:0">
+                <div class="between">
+                  <div class="row" style="gap:5px">
+                    <span class="h2" style="font-size:15px" data-en="Dr. Yousef Barakat" data-ar="د. يوسف بركات">Dr. Yousef Barakat</span>
+                    <span class="verified"></span>
+                  </div>
+                  <span class="dist">2.6 km</span>
+                </div>
+                <div class="xs" style="margin-top:2px" data-en="Dermatology · last seen 2 Feb 2026" data-ar="جلدية · آخر زيارة ٢ فبراير ٢٠٢٦">Dermatology · last seen 2 Feb 2026</div>
+                <button class="btn btn-secondary btn-sm" style="margin-top:var(--sp-3)"
+                        data-en="Book again" data-ar="احجز مجددًا">Book again</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="row" style="align-items:flex-start">
+              <div class="avatar" style="background:var(--gold-50);color:var(--gold-600)">LF</div>
+              <div style="flex:1;min-width:0">
+                <div class="between">
+                  <span class="h2" style="font-size:15px" data-en="Dr. Layla Farouk" data-ar="د. ليلى فاروق">Dr. Layla Farouk</span>
+                  <span class="dist">5.9 km</span>
+                </div>
+                <div class="xs" style="margin-top:2px" data-en="Paediatrics · last seen 11 Nov 2025" data-ar="أطفال · آخر زيارة ١١ نوفمبر ٢٠٢٥">Paediatrics · last seen 11 Nov 2025</div>
+                <button class="btn btn-secondary btn-sm" style="margin-top:var(--sp-3)"
+                        data-en="Book again" data-ar="احجز مجددًا">Book again</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="fade"></div>
+
+        <div class="tabbar">
+          <div class="tab"><svg viewBox="0 0 24 24"><path d="M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3z"/></svg><b data-en="Map" data-ar="الخريطة">Map</b></div>
+          <div class="tab"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><b data-en="Search" data-ar="بحث">Search</b></div>
+          <div class="tab on"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-9a4 4 0 017-2.6A4 4 0 0119 11c0 4.5-7 9-7 9z"/></svg><b data-en="Saved" data-ar="المحفوظة">Saved</b></div>
+          <div class="tab"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg><b data-en="Reports" data-ar="التقارير">Reports</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><b>11</b><span data-en="Consulted and favourites" data-ar="من راجعتهم والمفضلة">Consulted and favourites</span></div>
+  </div>
+
+  <!-- 12 REPORTS -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="sb-icons"><i></i></span></div>
+      <div class="body">
+        <div class="appbar" style="padding-top:var(--sp-4)">
+          <div style="flex:1">
+            <h2 data-en="Reports" data-ar="التقارير">Reports</h2>
+            <div class="sub" data-en="Every visit, in one place" data-ar="كل زياراتك في مكان واحد">Every visit, in one place</div>
+          </div>
+        </div>
+
+        <div class="pad stack scroll" style="gap:var(--sp-3)">
+          <div class="card" style="background:var(--surface-brand-subtle);border-color:var(--green-100)">
+            <div class="between">
+              <div>
+                <div class="h2" style="font-size:14px;color:var(--green-800)" data-en="12 records" data-ar="١٢ سجلًا">12 records</div>
+                <div class="xs" style="color:var(--green-700);margin-top:2px"
+                     data-en="Across 4 providers since 2024" data-ar="لدى ٤ مزودين منذ ٢٠٢٤">Across 4 providers since 2024</div>
+              </div>
+              <button class="btn btn-secondary btn-sm" data-en="Export" data-ar="تصدير">Export</button>
+            </div>
+          </div>
+
+          <div class="row" style="gap:var(--sp-2)">
+            <span class="chip-f on" data-en="All" data-ar="الكل">All</span>
+            <span class="chip-f" data-en="Visits" data-ar="الزيارات">Visits</span>
+            <span class="chip-f" data-en="Lab" data-ar="المختبر">Lab</span>
+            <span class="chip-f" data-en="Imaging" data-ar="الأشعة">Imaging</span>
+          </div>
+
+          <div class="card">
+            <div class="rep">
+              <div class="rep-ic">PDF</div>
+              <div style="flex:1;min-width:0">
+                <div class="h2" style="font-size:14px" data-en="Cardiology consultation" data-ar="استشارة قلب">Cardiology consultation</div>
+                <div class="xs" style="margin-top:2px" data-en="Dr. Hana Al Qahtani · 16 Mar 2026" data-ar="د. هناء القحطاني · ١٦ مارس ٢٠٢٦">Dr. Hana Al Qahtani · 16 Mar 2026</div>
+                <div class="row" style="gap:5px;margin-top:8px">
+                  <span class="tag tag-brand" data-en="Visit summary" data-ar="ملخص الزيارة">Visit summary</span>
+                  <span class="tag" data-en="Prescription" data-ar="وصفة">Prescription</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="rep">
+              <div class="rep-ic" style="background:var(--gold-50);color:var(--gold-600)">LAB</div>
+              <div style="flex:1;min-width:0">
+                <div class="h2" style="font-size:14px" data-en="Lipid panel" data-ar="تحليل الدهون">Lipid panel</div>
+                <div class="xs" style="margin-top:2px" data-en="King Fahad Medical City · 16 Mar 2026" data-ar="مدينة الملك فهد الطبية · ١٦ مارس ٢٠٢٦">King Fahad Medical City · 16 Mar 2026</div>
+                <div class="row" style="gap:5px;margin-top:8px">
+                  <span class="tag tag-info" data-en="Results ready" data-ar="النتائج جاهزة">Results ready</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="rep">
+              <div class="rep-ic">PDF</div>
+              <div style="flex:1;min-width:0">
+                <div class="h2" style="font-size:14px" data-en="Dermatology consultation" data-ar="استشارة جلدية">Dermatology consultation</div>
+                <div class="xs" style="margin-top:2px" data-en="Dr. Yousef Barakat · 2 Feb 2026" data-ar="د. يوسف بركات · ٢ فبراير ٢٠٢٦">Dr. Yousef Barakat · 2 Feb 2026</div>
+                <div class="row" style="gap:5px;margin-top:8px">
+                  <span class="tag tag-brand" data-en="Visit summary" data-ar="ملخص الزيارة">Visit summary</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="fade"></div>
+
+        <div class="tabbar">
+          <div class="tab"><svg viewBox="0 0 24 24"><path d="M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3z"/></svg><b data-en="Map" data-ar="الخريطة">Map</b></div>
+          <div class="tab"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><b data-en="Search" data-ar="بحث">Search</b></div>
+          <div class="tab"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-9a4 4 0 017-2.6A4 4 0 0119 11c0 4.5-7 9-7 9z"/></svg><b data-en="Saved" data-ar="المحفوظة">Saved</b></div>
+          <div class="tab on"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg><b data-en="Reports" data-ar="التقارير">Reports</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><b>12</b><span data-en="Reports" data-ar="التقارير">Reports</span></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+(function () {
+  var en = document.getElementById('btn-en');
+  var ar = document.getElementById('btn-ar');
+  var nodes = document.querySelectorAll('[data-en][data-ar]');
+
+  function apply(lang) {
+    var isAr = lang === 'ar';
+    document.documentElement.lang = isAr ? 'ar' : 'en';
+    document.documentElement.dir = isAr ? 'rtl' : 'ltr';
+    for (var i = 0; i < nodes.length; i++) {
+      nodes[i].textContent = isAr ? nodes[i].dataset.ar : nodes[i].dataset.en;
+    }
+    en.setAttribute('aria-pressed', String(!isAr));
+    ar.setAttribute('aria-pressed', String(isAr));
+  }
+
+  en.addEventListener('click', function () { apply('en'); });
+  ar.addEventListener('click', function () { apply('ar'); });
+})();
+</script>
+</body>
+</html>

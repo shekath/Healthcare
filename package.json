@@ -1,0 +1,11 @@
+{
+  "name": "qrib-prototype",
+  "version": "1.0.0",
+  "private": true,
+  "description": "QRIB — working mobile prototype of a Saudi healthcare finder & booking app for residents and travelers.",
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "node tests/e2e.mjs http://localhost:8080/"
+  }
+}
