@@ -86,9 +86,7 @@ register('map', {
           <button class="btn btn-secondary btn-sm" data-act="toggleSheet">${esc(t(s.expanded ? 'map' : 'list'))}</button>
         </div>
         <div class="sheet-list stack" data-scroll-id="sheet">
-          ${up ? `<button class="card tap" style="padding:var(--sp-3);background:var(--brand-50);border-color:var(--brand-100)" data-act="tab" data-tab="saved">
-              <div class="row">${icon('calendar')}<div class="grow"><div class="sm strong" style="color:var(--brand-800)">${esc(t('upcomingBanner', { d: `${relDay(up.date)} ${fmtTime(up.time)}` }))}</div>
-              <div class="xs" style="color:var(--brand-700)">${esc(L(doctorById(up.doctor).name))}</div></div><span class="sm brand-t strong">${esc(t('view'))}</span></div></button>` : ''}
+          ${up ? nextVisitCard(up) : ''}
           ${!nearby.length ? `<p class="xs">${esc(t('noNearby'))}</p>` : ''}
           ${shown.map(f => facilityCard(f, { sel: f.id === s.sel })).join('')}
         </div>
@@ -149,7 +147,20 @@ register('map', {
     map.addEventListener('click', clickCap, true);
     map.addEventListener('wheel', wheel, { passive: false });
     const ro = new ResizeObserver(layout); ro.observe(map);
-    return () => { ro.disconnect(); };
+    // next-visit card: light follows the pointer, countdown stays live
+    const nv = ctx.$('#nvCard');
+    const nvMove = e => {
+      const r = nv.getBoundingClientRect();
+      nv.style.setProperty('--mx', `${((e.clientX - r.left) / r.width * 100).toFixed(1)}%`);
+      nv.style.setProperty('--my', `${((e.clientY - r.top) / r.height * 100).toFixed(1)}%`);
+    };
+    const nvLeave = () => { nv.style.removeProperty('--mx'); nv.style.removeProperty('--my'); };
+    if (nv) { nv.addEventListener('pointermove', nvMove); nv.addEventListener('pointerleave', nvLeave); }
+    const cd = setInterval(() => {
+      const el = ctx.$('#nvCountdown');
+      if (el) el.textContent = countdown({ date: el.dataset.date, time: el.dataset.time });
+    }, 30000);
+    return () => { ro.disconnect(); clearInterval(cd); };
   },
   actions: {
     chip: (el, ev, ctx) => { ctx.s.chip = ctx.s.chip === el.dataset.v ? null : el.dataset.v; ctx.s.sel = null; ctx.rerender(); },
@@ -171,6 +182,32 @@ register('map', {
   },
 });
 function zoomBy(s, f) { s.zoom = Math.min(400, Math.max(1.5, s.zoom * f)); s.pan = { x: s.pan.x * f, y: s.pan.y * f }; }
+
+// ------------------------------------------------------------ next-visit card (shiny, follows the finger)
+function countdown(b) {
+  const [y, m, d] = b.date.split('-').map(Number), [hh, mm] = b.time.split(':').map(Number);
+  const mins = Math.round((new Date(y, m - 1, d, hh, mm) - Date.now()) / 60000);
+  if (mins <= 0) return t('nvNow');
+  if (mins < 60) return t('nvInMin', { m: mins });
+  if (mins < 24 * 60) return t('nvInHours', { h: Math.floor(mins / 60), m: mins % 60 });
+  const days = Math.round(mins / 1440);
+  return days === 1 ? t('nvInDay') : t('nvInDays', { n: days });
+}
+function nextVisitCard(b) {
+  const d = doctorById(b.doctor);
+  const video = b.visit === 'video';
+  return `<button class="nv-card" id="nvCard" data-act="tab" data-tab="saved" aria-label="${esc(t('upcomingBanner', { d: `${relDay(b.date)} ${fmtTime(b.time)}` }))}, ${esc(L(d.name))}">
+    <span class="nv-shine" aria-hidden="true"></span>
+    <span class="nv-glow" aria-hidden="true"></span>
+    <span class="nv-ic" aria-hidden="true">${icon(video ? 'video' : 'calendar')}</span>
+    <span class="nv-body">
+      <span class="nv-eyebrow"><i class="nv-dot"></i>${esc(t('nvTitle'))} · <b id="nvCountdown" data-date="${b.date}" data-time="${b.time}">${esc(countdown(b))}</b></span>
+      <span class="nv-when">${esc(relDay(b.date))} · ${esc(fmtTime(b.time))}</span>
+      <span class="nv-who">${esc(L(d.name))}</span>
+    </span>
+    <span class="nv-go">${esc(t('view'))}${icon('chev')}</span>
+  </button>`;
+}
 
 // ============================================================ SEARCH (tab)
 function resultsHtml(q) {

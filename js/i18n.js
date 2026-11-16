@@ -104,6 +104,12 @@ const S = {
     details: 'Details',
     noNearby: 'Nothing matches here. Try another filter or zoom out.',
     upcomingBanner: 'Next visit · {d}',
+    nvTitle: 'Next visit',
+    nvNow: 'starting now',
+    nvInMin: 'in {m} min',
+    nvInHours: 'in {h} h {m} min',
+    nvInDay: 'tomorrow',
+    nvInDays: 'in {n} days',
     view: 'View',
 
     // emergency
@@ -411,6 +417,12 @@ const S = {
     details: 'التفاصيل',
     noNearby: 'لا توجد نتائج هنا. جرّب تصفية أخرى أو صغّر الخريطة.',
     upcomingBanner: 'الزيارة القادمة · {d}',
+    nvTitle: 'الزيارة القادمة',
+    nvNow: 'تبدأ الآن',
+    nvInMin: 'خلال {m} دقيقة',
+    nvInHours: 'خلال {h} س {m} د',
+    nvInDay: 'غدًا',
+    nvInDays: 'خلال {n} أيام',
     view: 'عرض',
 
     emergencyTitle: 'مساعدة طارئة',

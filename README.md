@@ -51,7 +51,7 @@ You can switch later in **Account** (each profile keeps its own data). Every col
   - Filter chips: open now, emergency, and 6 specialties.
   - Tapping a pin highlights its card; tapping again opens the facility.
   - Every Nearby care card has its own directions button.
-  - The bottom sheet expands, and shows your next booking.
+  - The bottom sheet expands. When you have a booking, a **Next visit** card leads it: a brand-coloured gradient with a sweeping shine, a light that follows your finger, a pulsing live dot and a live countdown ("in 3 h 47 min"). Tapping it opens Saved.
   - The SOS button opens emergency numbers (997, 911, 937, 999/930) and the nearest emergency department.
 - Search across doctors, hospitals and specialties, in English or Arabic (Arabic search ignores diacritics and letter variants). Recent searches are kept, and there's a specialty grid.
 - **06** Refine: specialty, distance, availability, languages, gender, visit type, and "accepts my insurance". The button shows a live "Show N doctors" count.
