@@ -118,6 +118,12 @@ sw.js, manifest.webmanifest, icons/   PWA
 tests/e2e.mjs           Playwright end-to-end test of the full flow
 ```
 
+## Deploy
+
+Pushing to `main` runs `.github/workflows/pages.yml`. It runs the end-to-end test, then publishes the folder to GitHub Pages. No build step is needed. All paths are relative, so the app works from the repository's Pages sub-path (`https://<owner>.github.io/<repo>/`), and it installs as a PWA from there.
+
+GitHub Pages must be enabled once: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
 ## Test
 
 With the server running:
